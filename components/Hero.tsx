@@ -57,8 +57,7 @@ export function Hero() {
             className="mt-5 font-display text-4xl font-semibold leading-[1.1] tracking-tight text-paper-50 sm:text-5xl lg:text-[3.25rem]"
           >
             {profile.greeting}{" "}
-            <span className="text-ember-400">{profile.shortName}</span>{" "}
-            <span aria-hidden="true">{profile.wave}</span>
+            <span className="text-ember-400">{profile.shortName}</span>
           </motion.h1>
 
           <motion.p variants={item} className="mt-3 font-mono text-sm text-paper-400">
