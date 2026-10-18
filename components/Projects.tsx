@@ -1,35 +1,52 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { projects } from "@/lib/data";
-import { SectionHeading } from "./SectionHeading";
+import { cn } from "@/lib/utils";
 import { ProjectCard } from "./ProjectCard";
+import { Reveal } from "./Reveal";
+import { SectionHeader } from "./SectionHeader";
+import { buttonStyles, labelClass } from "./ui";
+
+const featured = projects.filter((project) => project.featured);
+const archive = projects.filter((project) => !project.featured);
+
+const pad = (n: number) => String(n).padStart(2, "0");
 
 export function Projects() {
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: false,
     align: "start",
-    // 'auto' -> geser sebanyak slide yang lagi kelihatan (1 di mobile, 2 di
-    // tablet, 3 di desktop), bukan 1 per 1. Ini yang bikin panah selalu
-    // geser satu "halaman" penuh dan rapi.
-    slidesToScroll: "auto",
     containScroll: "trimSnaps",
   });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [scrollSnapCount, setScrollSnapCount] = useState(0);
+  const [snapCount, setSnapCount] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
+  const thumbRef = useRef<HTMLDivElement>(null);
+  // Satu kartu terbuka dalam satu waktu; klik kartu yang sama = tutup
+  const [openId, setOpenId] = useState<string | null>(null);
+  const toggleProject = (id: string) =>
+    setOpenId((current) => (current === id ? null : id));
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setSelectedIndex(emblaApi.selectedScrollSnap());
-    setScrollSnapCount(emblaApi.scrollSnapList().length);
+    setSnapCount(emblaApi.scrollSnapList().length);
     setCanScrollPrev(emblaApi.canScrollPrev());
     setCanScrollNext(emblaApi.canScrollNext());
+  }, [emblaApi]);
+
+  // Progress bar diupdate langsung ke DOM (bukan state) supaya tidak
+  // re-render puluhan kali per detik saat carousel digeser
+  const onScroll = useCallback(() => {
+    if (!emblaApi || !thumbRef.current) return;
+    const snaps = emblaApi.scrollSnapList().length;
+    const progress = Math.min(1, Math.max(0, emblaApi.scrollProgress()));
+    thumbRef.current.style.width = `${100 / Math.max(1, snaps)}%`;
+    thumbRef.current.style.transform = `translateX(${progress * (snaps - 1) * 100}%)`;
   }, [emblaApi]);
 
   useEffect(() => {
@@ -38,108 +55,163 @@ export function Projects() {
     // melainkan membaca status instance carousel yang baru terpasang).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     onSelect();
-    emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", onSelect);
+    onScroll();
+    emblaApi.on("select", onSelect).on("reInit", onSelect);
+    emblaApi.on("scroll", onScroll).on("reInit", onScroll);
     return () => {
-      emblaApi.off("select", onSelect);
-      emblaApi.off("reInit", onSelect);
+      emblaApi.off("select", onSelect).off("reInit", onSelect);
+      emblaApi.off("scroll", onScroll).off("reInit", onScroll);
     };
-  }, [emblaApi, onSelect]);
+  }, [emblaApi, onSelect, onScroll]);
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      emblaApi?.scrollPrev();
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      emblaApi?.scrollNext();
+    }
+  };
 
   return (
-    <section id="projects" className="border-b border-line-700/60 py-24">
-      <div className="mx-auto max-w-6xl px-6 sm:px-8">
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <SectionHeading
-            index="03"
-            label="projects"
-            title="Project pilihan"
-            description="Beberapa project yang telah saya buat, kembangkan, ataupun berkontribusi dalam pembuatan."
-          />
-
-          {/* Tombol navigasi (desktop) */}
-          <div className="hidden gap-2 sm:flex">
-            <button
-              type="button"
-              onClick={() => emblaApi?.scrollPrev()}
-              disabled={!canScrollPrev}
-              aria-label="Project sebelumnya"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-line-700 text-paper-100 transition-colors hover:border-ember-400 hover:text-ember-300 disabled:opacity-30 disabled:hover:border-line-700 disabled:hover:text-paper-100"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              type="button"
-              onClick={() => emblaApi?.scrollNext()}
-              disabled={!canScrollNext}
-              aria-label="Project berikutnya"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-line-700 text-paper-100 transition-colors hover:border-ember-400 hover:text-ember-300 disabled:opacity-30 disabled:hover:border-line-700 disabled:hover:text-paper-100"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-        </div>
-
-        {/* Viewport carousel — basis-full/1-2/1-3 supaya 1/2/3 kartu penuh
-            sejajar persis (gak ada yang kepotong setengah) */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
-          className="mt-10 overflow-hidden"
-          ref={emblaRef}
-        >
-          <div className="-ml-6 flex">
-            {projects.map((project) => (
-              <div
-                key={project.id}
-                className="shrink-0 basis-full pl-6 sm:basis-1/2 lg:basis-1/3"
-              >
-                <ProjectCard project={project} />
+    <section
+      id="projects"
+      aria-labelledby="projects-title"
+      className="pb-20 md:pb-28 lg:pb-40"
+    >
+      <div className="shell">
+        <SectionHeader
+          index="02"
+          label="Selected work"
+          title="Things I've shipped"
+          titleId="projects-title"
+          aside={
+            <div className="flex items-center gap-4">
+              <p className={cn(labelClass, "hidden text-muted lg:block")}>
+                Select a project for details
+              </p>
+              <p className={labelClass} aria-live="polite">
+                <span className="text-fg">{pad(selectedIndex + 1)}</span>
+                <span className="text-muted">
+                  {" "}
+                  / {pad(Math.max(snapCount, 1))}
+                </span>
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => emblaApi?.scrollPrev()}
+                  disabled={!canScrollPrev}
+                  className={buttonStyles.icon}
+                  aria-label="Previous project"
+                >
+                  <ChevronLeft size={18} strokeWidth={1.5} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => emblaApi?.scrollNext()}
+                  disabled={!canScrollNext}
+                  className={buttonStyles.icon}
+                  aria-label="Next project"
+                >
+                  <ChevronRight
+                    size={18}
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  />
+                </button>
               </div>
-            ))}
-          </div>
-        </motion.div>
+            </div>
+          }
+        />
 
-        {/* Dot indicator (per halaman, bukan per kartu) + tombol mobile */}
-        <div className="mt-8 flex items-center justify-between sm:justify-center sm:gap-6">
-          <button
-            type="button"
-            onClick={() => emblaApi?.scrollPrev()}
-            disabled={!canScrollPrev}
-            aria-label="Project sebelumnya"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-line-700 text-paper-100 disabled:opacity-30 sm:hidden"
+        <Reveal className="mt-12">
+          <div
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="Selected projects"
+            onKeyDown={onKeyDown}
           >
-            <ChevronLeft size={16} />
-          </button>
+            {/* Pinggir kanan memudar = petunjuk masih ada slide berikutnya */}
+            <div
+              ref={emblaRef}
+              className={cn(
+                "overflow-hidden",
+                canScrollNext &&
+                  "[mask-image:linear-gradient(to_right,black_85%,transparent)]",
+              )}
+            >
+              <div className="-ml-6 flex items-start">
+                {featured.map((project, index) => (
+                  <div
+                    key={project.id}
+                    role="group"
+                    aria-roledescription="slide"
+                    aria-label={`${index + 1} of ${featured.length}`}
+                    className="min-w-0 shrink-0 grow-0 basis-[85%] pl-6 sm:basis-[60%] lg:basis-[464px]"
+                  >
+                    <ProjectCard
+                      project={project}
+                      isOpen={openId === project.id}
+                      onToggle={() => toggleProject(project.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
 
-          <div className="flex items-center gap-2">
-            {Array.from({ length: scrollSnapCount }).map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => emblaApi?.scrollTo(index)}
-                aria-label={`Ke halaman project ${index + 1}`}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === selectedIndex
-                    ? "w-6 bg-ember-400"
-                    : "w-1.5 bg-line-600 hover:bg-line-500"
-                }`}
+            <div className="relative mt-10 h-px bg-line" aria-hidden="true">
+              <div
+                ref={thumbRef}
+                className="absolute inset-y-0 left-0 bg-fg transition-transform duration-150"
               />
-            ))}
+            </div>
           </div>
+        </Reveal>
 
-          <button
-            type="button"
-            onClick={() => emblaApi?.scrollNext()}
-            disabled={!canScrollNext}
-            aria-label="Project berikutnya"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-line-700 text-paper-100 disabled:opacity-30 sm:hidden"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
+        {archive.length > 0 && (
+          <Reveal className="mt-20">
+            <h3 className={cn(labelClass, "text-muted")}>Archive</h3>
+            <ul className="mt-4">
+              {archive.map((project) => (
+                <li
+                  key={project.id}
+                  className="border-t border-line last:border-b"
+                >
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-start justify-between gap-6 py-5"
+                  >
+                    <div className="min-w-0 flex-1 md:grid md:grid-cols-[2fr_2fr_auto] md:items-baseline md:gap-6">
+                      <span className="block text-body text-fg transition-transform duration-150 group-hover:translate-x-1">
+                        {project.title}
+                      </span>
+                      <span className="mt-1 block text-body-sm text-muted md:mt-0">
+                        {project.category}
+                        <span className="md:hidden"> · {project.year}</span>
+                      </span>
+                      <span
+                        className={cn(labelClass, "hidden text-muted md:block")}
+                      >
+                        {project.year}
+                      </span>
+                    </div>
+                    <ArrowUpRight
+                      size={18}
+                      strokeWidth={1.5}
+                      className="mt-0.5 shrink-0 text-muted transition-colors duration-150 group-hover:text-accent"
+                      aria-hidden="true"
+                    />
+                    <span className="sr-only">(opens in new tab)</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        )}
       </div>
     </section>
   );

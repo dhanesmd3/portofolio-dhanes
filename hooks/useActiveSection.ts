@@ -5,12 +5,17 @@ import { useEffect, useState } from "react";
 /**
  * Mengamati elemen-elemen section berdasarkan id, lalu mengembalikan
  * id section yang sedang paling dominan terlihat di viewport.
+ * Return "" kalau belum ada section yang terlihat (mis. di halaman 404).
  */
-export function useActiveSection(ids: string[]) {
-  const [activeId, setActiveId] = useState<string>(ids[0] ?? "");
+export function useActiveSection(ids: readonly string[]) {
+  const [activeId, setActiveId] = useState("");
+  // Pakai string sebagai dependency supaya array baru dengan isi sama
+  // tidak bikin observer dipasang ulang tiap render
+  const key = ids.join(",");
 
   useEffect(() => {
-    const elements = ids
+    const elements = key
+      .split(",")
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
 
@@ -30,12 +35,12 @@ export function useActiveSection(ids: string[]) {
         // Garis tengah viewport jadi acuan utama supaya transisi terasa pas
         rootMargin: "-35% 0px -55% 0px",
         threshold: [0, 0.25, 0.5, 0.75, 1],
-      }
+      },
     );
 
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [ids]);
+  }, [key]);
 
   return activeId;
 }

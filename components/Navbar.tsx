@@ -1,118 +1,158 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { navLinks, profile } from "@/lib/data";
 import { useActiveSection } from "@/hooks/useActiveSection";
+import { cn } from "@/lib/utils";
+import { ThemeToggle } from "./ThemeToggle";
+import { easeOutSoft } from "./Reveal";
+import { buttonStyles, labelClass } from "./ui";
+
+const sectionIds = navLinks.map((link) => link.id);
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const activeId = useActiveSection(navLinks.map((link) => link.href.slice(1)));
+  const activeId = useActiveSection(sectionIds);
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 16);
+    const onScroll = () => setIsScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleNavClick = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    href: string
-  ) => {
-    event.preventDefault();
-    const target = document.querySelector(href);
-    target?.scrollIntoView({ behavior: "smooth" });
-    setIsMenuOpen(false);
-  };
+  // Saat menu mobile terbuka: kunci scroll halaman + tutup dengan Esc
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isMenuOpen]);
+
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        isScrolled
-          ? "bg-ink-950/80 backdrop-blur-md border-b border-line-700"
-          : "bg-transparent border-b border-transparent"
-      }`}
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color] duration-300",
+        isScrolled || isMenuOpen
+          ? "border-line bg-canvas/80 backdrop-blur-md"
+          : "border-transparent",
+      )}
     >
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 sm:px-8">
-        <a
-          href="#about"
-          onClick={(e) => handleNavClick(e, "#about")}
-          className="font-mono text-base font-medium tracking-tight text-paper-50"
-        >
-          <span className="text-ember-400">{"<"}</span>
-          {profile.shortName}
-          <span className="text-ember-400">{" />"}</span>
-        </a>
+      <nav
+        aria-label="Main"
+        className="shell flex h-16 items-center justify-between gap-6"
+      >
+        {/* Link pakai "/#id" supaya tetap jalan dari halaman lain (mis. 404) */}
+        <Link href="/#about" onClick={closeMenu} className="text-lg text-fg">
+          {profile.wordmark}
+        </Link>
 
-        {/* Menu desktop */}
-        <ul className="hidden items-center gap-8 md:flex">
+        <ul className="hidden items-center gap-6 lg:flex">
           {navLinks.map((link) => {
-            const isActive = activeId === link.href.slice(1);
+            const isActive = activeId === link.id;
             return (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className="group relative flex items-center gap-2 py-1 text-sm text-paper-300 transition-colors hover:text-paper-50"
+              <li key={link.id}>
+                <Link
+                  href={`/#${link.id}`}
+                  aria-current={isActive ? "true" : undefined}
+                  className={cn(
+                    labelClass,
+                    "flex items-center gap-2 transition-colors duration-150 hover:text-fg",
+                    isActive ? "text-fg" : "text-muted",
+                  )}
                 >
                   <span
-                    className={`font-mono text-xs transition-colors ${
-                      isActive ? "text-ember-400" : "text-paper-600"
-                    }`}
-                  >
-                    {link.index}
-                  </span>
-                  {link.label}
-                  <span
-                    className={`absolute -bottom-1 left-0 h-px bg-ember-400 transition-all duration-300 ${
-                      isActive ? "w-full" : "w-0 group-hover:w-full"
-                    }`}
+                    className={cn(
+                      "size-1 rounded-full bg-accent transition-opacity duration-150",
+                      isActive ? "opacity-100" : "opacity-0",
+                    )}
                     aria-hidden="true"
                   />
-                </a>
+                  {link.label}
+                </Link>
               </li>
             );
           })}
         </ul>
 
-        {/* Tombol menu mobile */}
-        <button
-          type="button"
-          onClick={() => setIsMenuOpen((open) => !open)}
-          className="flex h-9 w-9 items-center justify-center rounded-md border border-line-700 text-paper-100 md:hidden"
-          aria-label="Buka menu navigasi"
-          aria-expanded={isMenuOpen}
-        >
-          {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
-        </button>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <Link
+            href="/#contact"
+            className={cn(
+              labelClass,
+              "hidden rounded-full border border-fg px-4 py-2 text-fg transition-colors duration-150 hover:bg-fg/6 sm:inline-flex",
+            )}
+          >
+            Let&apos;s connect
+          </Link>
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            className={cn(buttonStyles.icon, "lg:hidden")}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
+          >
+            {isMenuOpen ? (
+              <X size={18} strokeWidth={1.5} aria-hidden="true" />
+            ) : (
+              <Menu size={18} strokeWidth={1.5} aria-hidden="true" />
+            )}
+          </button>
+        </div>
       </nav>
 
-      {/* Menu mobile */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.ul
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="overflow-hidden border-t border-line-700 bg-ink-950/95 backdrop-blur-md md:hidden"
+          <motion.div
+            id="mobile-menu"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: easeOutSoft }}
+            className="fixed inset-x-0 top-16 bottom-0 bg-overlay backdrop-blur-md lg:hidden"
           >
-            {navLinks.map((link) => (
-              <li key={link.href} className="border-b border-line-700/60 last:border-none">
-                <a
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className="flex items-center gap-3 px-6 py-4 text-sm text-paper-200"
+            <ul className="shell flex flex-col pt-6">
+              {navLinks.map((link, index) => (
+                <motion.li
+                  key={link.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.4,
+                    ease: easeOutSoft,
+                    delay: 0.05 + index * 0.06,
+                  }}
+                  className="border-b border-line"
                 >
-                  <span className="font-mono text-xs text-ember-400">{link.index}</span>
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </motion.ul>
+                  <Link
+                    href={`/#${link.id}`}
+                    onClick={closeMenu}
+                    className="flex items-baseline gap-4 py-4 text-heading text-fg"
+                  >
+                    <span className={cn(labelClass, "text-accent")}>
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    {link.label}
+                  </Link>
+                </motion.li>
+              ))}
+            </ul>
+          </motion.div>
         )}
       </AnimatePresence>
     </header>

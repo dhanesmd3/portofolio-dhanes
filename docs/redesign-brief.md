@@ -15,7 +15,7 @@ Kerjain **satu section per prompt**, cek hasilnya, baru lanjut.
 - **Tujuan:** portofolio yang simple, minimalis, profesional, tapi tetap ada satu-dua detail yang bikin diinget.
 - **Prinsip:** isi > dekorasi. Tiap section harus nunjukin *bukti* (project jadi, hasil, angka), bukan klaim ("fast learner").
 - **Bentuk:** single page, satu kolom, scroll dari atas ke bawah, header sticky dengan anchor link.
-- **Stack (tetap):** Next.js 16 (App Router), React 19, Tailwind CSS v4, framer-motion, embla-carousel-react, lucide-react, react-icons. Semua konten tetap dari `lib/data.ts`.
+- **Stack (tetap):** Next.js 16 (App Router), React 19, Tailwind CSS v4, Motion (`motion/react`), embla-carousel-react, lucide-react, react-icons (Simple Icons). Backend kontak: Resend + zod. Tooling: Node 24 LTS, Prettier, Vitest. Semua konten tetap dari `lib/data.ts`.
 
 ## 1. Referensi
 
@@ -91,7 +91,6 @@ Font yang terlalu sering muncul di web template/AI (Inter, Geist, Space Grotesk,
 - Foto (`public/profile.jpg`)
 - CTA: **Download CV** (`/cv-dhanesworo.pdf`) + **View projects** (scroll ke `#projects`)
 - Ikon sosial kecil: GitHub, LinkedIn, Email
-- (Opsional) badge "Currently: …" (lihat bagian 4)
 
 **Layout**
 - Desktop: teks kiri, foto kanan. Mobile: foto di atas, teks di bawah.
@@ -122,7 +121,7 @@ Cara bikinnya pakai `mask-image` di CSS. Masknya bikin piksel transparan, bukan 
 Tips biar hasilnya bagus:
 - Paling rapi kalau **background foto dihapus dulu** (remove.bg / Photoshop), simpan sebagai PNG/WebP transparan. Kalau nggak, pakai foto yang latarnya polos dan warnanya dekat sama `bg` web.
 - Opsional: `grayscale` + sedikit kontras, berubah jadi berwarna saat hover. Kesannya lebih editorial.
-- Tetap pakai `next/image` (kasih `priority` karena ada di atas). `mask-image` dipasang di wrapper atau langsung di `<Image>`.
+- Tetap pakai `next/image` (kasih `preload` karena ada di atas; `priority` sudah deprecated di Next 16). `mask-image` dipasang di wrapper atau langsung di `<Image>`.
 
 **Catatan copy**
 - Semua copy pakai English, termasuk yang sekarang masih Indonesia di `lib/data.ts` (deskripsi project, bio, dll.).
@@ -132,7 +131,7 @@ Tips biar hasilnya bagus:
 ### 3.2 Tools — `#tools`
 
 **Isi:** daftar tools, **dikelompokin**:
-- **Languages:** JavaScript, Python, C, GNU Prolog
+- **Languages:** JavaScript, Python, Java, C, Haskell, GNU Prolog
 - **Frontend:** Next.js, React, Tailwind CSS
 - **Backend & data:** Node.js, MySQL
 - **Workflow:** Git, GitHub
@@ -189,7 +188,7 @@ Dua blok berdampingan di desktop (kiri Experience, kanan Achievements), ditumpuk
 **Tampilan**
 - Grid masonry / bento (ukuran kotak campur: ada yang 2×2, 1×2, 1×1), 6–9 foto.
 - Tiap foto ada caption pendek (1–3 kata, kayak wisee: "Futsal", "Hiking", "Coffee").
-- Hover: foto zoom tipis + caption muncul. Klik: buka lightbox (opsional).
+- Klik foto = toggle: info tipis (caption + 1 kalimat `description`) naik dari bawah foto. Satu foto terbuka dalam satu waktu. Nggak pakai lightbox.
 - Satu kalimat intro di atas galeri.
 - Foto disimpan di `public/beyond/`, pakai `next/image` + `sizes` biar ringan.
 
@@ -273,7 +272,7 @@ Keterbatasan yang perlu diketahui:
 Diurutin dari yang paling ngaruh:
 
 1. **Education di Experience.** ITB itu kredibilitas, tampilin jelas.
-2. **Badge "Currently…"** di hero, mis. "Currently building X" / "Learning ML". Bikin web kerasa hidup, gampang di-update.
+2. ~~**Badge "Currently…"** di hero, mis. "Currently building X" / "Learning ML". Bikin web kerasa hidup, gampang di-update.~~ (dicoba, lalu dihapus atas permintaan)
 3. **SEO & share preview.** `metadata` lengkap, OG image (gambar yang muncul kalau link dishare di WA/LinkedIn), favicon sendiri.
 4. **Halaman case study** `/projects/[slug]` buat 1–2 project terbaik: masalah, peranmu, proses, hasil, screenshot.
 5. **Command palette `Ctrl/⌘+K`** buat navigasi + copy email. Detail kecil yang "developer banget".
@@ -309,5 +308,5 @@ Diurutin dari yang paling ngaruh:
 - Gambar wajib `next/image` dengan `alt` yang jelas.
 - Responsif dari 360px sampai desktop lebar, tanpa horizontal scroll halaman.
 - Aksesibilitas: HTML semantik (`<section>`, `<nav>`, heading berurutan), fokus keyboard kelihatan, kontras cukup, `prefers-reduced-motion`.
-- Jangan nambah dependency baru tanpa alasan jelas. Carousel pakai embla, animasi pakai framer-motion. Dependency baru yang udah disetujui: `resend`, `zod`.
+- Jangan nambah dependency baru tanpa alasan jelas. Carousel pakai embla, animasi pakai Motion (`motion/react`). Dependency yang udah disetujui: `resend`, `zod`, dan dev tools `prettier`, `prettier-plugin-tailwindcss`, `vitest`.
 - Jalanin `npm run lint` dan `npm run build` sebelum selesai.

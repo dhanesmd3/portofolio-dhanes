@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
   // Tambahkan IP "Network" yang muncul di terminal saat `npm run dev` jalan.
   // Kalau IP kamu beda/berubah (misal pindah WiFi), update juga di sini.
   allowedDevOrigins: ["192.168.1.15"],
+
+  images: {
+    // AVIF lebih kecil dari WebP; browser yang belum support otomatis dapat WebP.
+    formats: ["image/avif", "image/webp"],
+  },
 };
 
 export default nextConfig;

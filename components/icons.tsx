@@ -1,4 +1,62 @@
 import type { SVGProps } from "react";
+import { Mail } from "lucide-react";
+import type { IconType } from "react-icons";
+import {
+  SiC,
+  SiGit,
+  SiGithub,
+  SiGnu,
+  SiHaskell,
+  SiInstagram,
+  SiJavascript,
+  SiMysql,
+  SiNextdotjs,
+  SiNodedotjs,
+  SiOpenjdk,
+  SiPython,
+  SiReact,
+  SiTailwindcss,
+} from "react-icons/si";
+import type { SocialIcon, ToolIcon } from "@/lib/data";
+
+// Semua logo teknologi dari satu set (Simple Icons) supaya gayanya seragam.
+// Warnanya selalu ikut currentColor (monokrom), bukan warna brand.
+export const toolIcons: Record<ToolIcon, IconType> = {
+  javascript: SiJavascript,
+  python: SiPython,
+  java: SiOpenjdk,
+  haskell: SiHaskell,
+  c: SiC,
+  gnu: SiGnu,
+  nextjs: SiNextdotjs,
+  react: SiReact,
+  tailwind: SiTailwindcss,
+  nodejs: SiNodedotjs,
+  mysql: SiMysql,
+  git: SiGit,
+  github: SiGithub,
+};
+
+export function SocialGlyph({
+  icon,
+  className,
+}: {
+  icon: SocialIcon;
+  className?: string;
+}) {
+  switch (icon) {
+    case "github":
+      return <GithubIcon className={className} />;
+    case "linkedin":
+      return <LinkedinIcon className={className} />;
+    case "instagram":
+      return <SiInstagram className={className} aria-hidden="true" />;
+    case "mail":
+      return (
+        <Mail className={className} strokeWidth={1.5} aria-hidden="true" />
+      );
+  }
+}
 
 export function GithubIcon(props: SVGProps<SVGSVGElement>) {
   return (
