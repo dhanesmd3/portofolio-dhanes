@@ -66,6 +66,9 @@ Font yang terlalu sering muncul di web template/AI (Inter, Geist, Space Grotesk,
 - Wajib hormati `prefers-reduced-motion` (matikan animasi).
 
 ### Header
+
+> **Update:** header sekarang pill kaca mengambang (gaya newminds.studio). Lihat DESIGN.md → Top Navigation.
+
 - Sticky, background blur tipis saat discroll.
 - Kiri: nama/inisial. Tengah/kanan: About, Projects, Experience, Beyond Tech, Contact. Kanan: toggle light/dark.
 - Link aktif di-highlight sesuai section yang lagi keliatan (`hooks/useActiveSection.ts` udah ada).
@@ -169,6 +172,9 @@ Tips biar hasilnya bagus:
 
 ### 3.4 Achievements & Experience — `#experience`
 
+> **Update:** data diisi dari LinkedIn (Profile.pdf, Okt 2026). Timeline 9 entri (5 tampil + "Show earlier"), Education + Achievements di panel kaca samping. Lihat DESIGN.md → Timeline Item.
+
+
 Dua blok berdampingan di desktop (kiri Experience, kanan Achievements), ditumpuk di mobile.
 
 **Experience (timeline bernomor kayak wisee)**
@@ -182,6 +188,9 @@ Dua blok berdampingan di desktop (kiri Experience, kanan Achievements), ditumpuk
 **Data:** belum ada, isi di `lib/data.ts` dengan type `Experience` dan `Achievement`.
 
 ### 3.5 Beyond Tech — `#beyond`
+
+> **Update:** bento grid diganti **ring 3D** gaya velmax.llc ("What's going on the shelf"): berputar sendiri, bisa di-drag, dan kartu bisa dibuka untuk info. Data: `caption` + `description` per item, 8–12 item. Lihat DESIGN.md → Beyond Tech Ring.
+
 
 **Isi:** hobi dan kegiatan di luar ngoding, bentuknya galeri foto.
 

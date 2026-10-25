@@ -11,13 +11,13 @@ export const buttonStyles = {
     buttonBase,
     "rounded-full bg-action-bg px-6 py-3 text-action-fg hover:opacity-90",
   ),
-  // Aksi sekunder di samping primary — radius 8px, bukan pill
+  // Aksi sekunder di samping primary — pill kaca (liquid glass)
   ghost: cn(
     buttonBase,
-    "rounded-card border border-fg px-5 py-3 text-fg hover:bg-fg/6",
+    "rounded-full px-5 py-3 text-fg glass-chip hover:border-line-strong hover:bg-fg/6",
   ),
   // Tombol lingkaran 40px untuk ikon (panah carousel, toggle tema, menu)
-  icon: "inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-line text-fg transition-colors duration-150 hover:border-line-strong disabled:pointer-events-none disabled:opacity-40",
+  icon: "inline-flex size-10 shrink-0 items-center justify-center rounded-full text-fg glass-chip transition-colors duration-150 hover:border-line-strong disabled:pointer-events-none disabled:opacity-40",
 };
 
 // Geser panah sedikit ke arah tujuannya saat parent (.group) di-hover
@@ -42,7 +42,7 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-tag border border-line bg-raised px-3 py-1.5 text-muted",
+        "inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-muted glass-chip",
         labelClass,
         className,
       )}

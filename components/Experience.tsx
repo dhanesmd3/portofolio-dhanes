@@ -1,11 +1,10 @@
-import { ArrowUpRight, Trophy } from "lucide-react";
-import { achievements, experiences, type Achievement } from "@/lib/data";
+import { ArrowUpRight, GraduationCap, Trophy } from "lucide-react";
+import { achievements, education, type Achievement } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { ExperienceTimeline } from "./ExperienceTimeline";
 import { Reveal } from "./Reveal";
 import { SectionHeader } from "./SectionHeader";
 import { labelClass } from "./ui";
-
-const pad = (n: number) => String(n).padStart(2, "0");
 
 function AchievementContent({ achievement }: { achievement: Achievement }) {
   return (
@@ -28,7 +27,9 @@ function AchievementContent({ achievement }: { achievement: Achievement }) {
             />
           )}
         </p>
-        <p className="mt-0.5 text-body-sm text-muted">{achievement.issuer}</p>
+        {achievement.issuer && (
+          <p className="mt-0.5 text-body-sm text-muted">{achievement.issuer}</p>
+        )}
       </div>
       <p className={cn(labelClass, "mt-1 shrink-0 text-muted")}>
         {achievement.year}
@@ -52,54 +53,44 @@ export function Experience() {
           titleId="experience-title"
         />
 
-        <div className="mt-12 grid gap-16 lg:grid-cols-12 lg:gap-6">
+        <div className="mt-12 grid items-start gap-16 lg:grid-cols-12 lg:gap-6">
           <Reveal className="lg:col-span-7">
             <h3 className={cn(labelClass, "text-muted")}>Timeline</h3>
-            <ol className="mt-4">
-              {experiences.map((experience, index) => (
-                <li
-                  key={`${experience.organization}-${index}`}
-                  className="grid grid-cols-[88px_1fr] gap-4 border-t border-line py-6 last:border-b sm:grid-cols-[120px_1fr]"
-                >
-                  <div>
-                    <p className={cn(labelClass, "text-accent")}>
-                      {pad(index + 1)}
-                    </p>
-                    <p className={cn(labelClass, "mt-1 text-muted")}>
-                      {experience.period}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="inline-block rounded-tag border border-line px-2 py-1 font-mono text-label text-muted uppercase">
-                      {experience.kind}
-                    </span>
-                    <h4 className="mt-3 text-heading-sm text-fg">
-                      {experience.role}
-                    </h4>
-                    <p className="mt-1 text-body text-muted">
-                      {experience.organization}
-                    </p>
-                    {experience.highlights.length > 0 && (
-                      <ul className="mt-3 space-y-1.5">
-                        {experience.highlights.map((highlight) => (
-                          <li
-                            key={highlight}
-                            className="flex gap-2 text-body-sm text-muted"
-                          >
-                            <span aria-hidden="true">–</span>
-                            <span>{highlight}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <ExperienceTimeline />
           </Reveal>
 
-          <Reveal className="lg:col-span-4 lg:col-start-9" delay={0.1}>
-            <h3 className={cn(labelClass, "text-muted")}>Achievements</h3>
+          {/* Panel kaca: pendidikan + pencapaian */}
+          <Reveal
+            className="rounded-glass p-6 glass md:p-8 lg:sticky lg:top-24 lg:col-span-5 lg:col-start-8"
+            delay={0.1}
+          >
+            <h3 className={cn(labelClass, "text-muted")}>Education</h3>
+            <ul className="mt-4">
+              {education.map((item) => (
+                <li
+                  key={item.school}
+                  className="flex gap-3 border-t border-line py-4 last:border-b"
+                >
+                  <GraduationCap
+                    size={16}
+                    strokeWidth={1.5}
+                    className="mt-1 shrink-0 text-accent"
+                    aria-hidden="true"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-body text-fg">{item.school}</p>
+                    <p className="mt-0.5 text-body-sm text-muted">
+                      {item.degree}
+                    </p>
+                  </div>
+                  <p className={cn(labelClass, "mt-1 shrink-0 text-muted")}>
+                    {item.period}
+                  </p>
+                </li>
+              ))}
+            </ul>
+
+            <h3 className={cn(labelClass, "mt-10 text-muted")}>Achievements</h3>
             <ul className="mt-4">
               {achievements.map((achievement) => (
                 <li

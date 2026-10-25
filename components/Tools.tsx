@@ -10,6 +10,7 @@ import { toolIcons } from "./icons";
 import { Reveal } from "./Reveal";
 import { SectionHeader } from "./SectionHeader";
 import { labelClass } from "./ui";
+import { cn } from "@/lib/utils";
 
 const groupIcons: Record<ToolGroup["icon"], LucideIcon> = {
   languages: CodeXml,
@@ -38,12 +39,20 @@ export function Tools() {
           }
         />
 
-        {/* Trik grid hairline: background = warna garis, gap 1px, sel = warna kanvas */}
-        <Reveal className="mt-12 grid gap-px overflow-hidden rounded-card border border-line bg-line md:grid-cols-2">
-          {toolGroups.map((group) => {
+        {/* Panel kaca, dibagi 2×2 oleh garis tipis di antara sel */}
+        <Reveal className="mt-12 grid overflow-hidden rounded-glass glass md:grid-cols-2">
+          {toolGroups.map((group, index) => {
             const GroupIcon = groupIcons[group.icon];
             return (
-              <div key={group.name} className="bg-canvas p-6 md:p-8">
+              <div
+                key={group.name}
+                className={cn(
+                  "border-line p-6 md:p-8",
+                  index < toolGroups.length - 1 && "border-b",
+                  index % 2 === 0 && "md:border-r",
+                  index >= toolGroups.length - 2 && "md:border-b-0",
+                )}
+              >
                 <GroupIcon
                   size={24}
                   strokeWidth={1.5}

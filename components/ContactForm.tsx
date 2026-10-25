@@ -18,7 +18,7 @@ type Values = ContactInput & { website: string };
 const emptyValues: Values = { name: "", email: "", message: "", website: "" };
 
 const fieldClass =
-  "w-full rounded-card border bg-carbon px-3.5 py-3 text-base text-fg transition-colors duration-150 placeholder:text-muted/70 focus:border-fg focus-visible:outline-none";
+  "w-full rounded-card border bg-carbon/60 px-3.5 py-3 text-base text-fg transition-colors duration-150 placeholder:text-muted/70 focus:border-fg focus-visible:outline-none";
 
 export function ContactForm() {
   const [values, setValues] = useState<Values>(emptyValues);
@@ -94,7 +94,7 @@ export function ContactForm() {
     <form
       onSubmit={onSubmit}
       noValidate
-      className="relative rounded-card border border-line p-6 md:p-8"
+      className="relative rounded-glass p-6 glass md:p-8"
     >
       <div className="grid gap-6">
         <Field id="contact-name" label="Name" error={errors.name?.[0]}>

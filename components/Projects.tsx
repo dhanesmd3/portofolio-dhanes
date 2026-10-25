@@ -180,7 +180,7 @@ export function Projects() {
                   className="border-t border-line last:border-b"
                 >
                   <a
-                    href={project.url}
+                    href={project.url ?? project.repoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group flex items-start justify-between gap-6 py-5"

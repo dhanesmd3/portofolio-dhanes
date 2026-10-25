@@ -12,7 +12,7 @@ export const profile = {
   nickname: "Dhanes",
   wordmark: "Dhanesworo",
   tagline: "Informatics Student at ITB · Web Developer",
-  bio: "Informatics student at Institut Teknologi Bandung who builds for the web with Next.js and React. I've shipped sites for national competitions, communities, and a hackathon — and I'm heading toward full-stack and AI next.",
+  bio: "Informatics student at Institut Teknologi Bandung who loves building apps, websites, and projects that are meaningful, impactful, and fun — with a real hunger for winning competitions. Next, I'm growing toward AI/ML engineering.",
   location: "Bandung, ID",
   timeZone: "Asia/Jakarta",
   timeZoneLabel: "WIB",
@@ -65,7 +65,8 @@ export const navLinks = [
   { label: "About", id: "about" },
   { label: "Projects", id: "projects" },
   { label: "Experience", id: "experience" },
-  { label: "Beyond Tech", id: "beyond" },
+  // inCompact: false = disembunyikan di tampilan Compact
+  { label: "Beyond Tech", id: "beyond", inCompact: false },
   { label: "Contact", id: "contact" },
 ] as const;
 
@@ -134,7 +135,7 @@ export const toolGroups: ToolGroup[] = [
 
 // ─── Projects ────────────────────────────────────────────────────────────
 
-export type ProjectStatus = "LIVE" | "NEW" | "BETA";
+export type ProjectStatus = "LIVE" | "NEW" | "BETA" | "TOP 30";
 
 export type ProjectImage = { src: string; width: number; height: number };
 
@@ -146,8 +147,12 @@ export type Project = {
   // Kalimat pertama sebaiknya langsung menyebut hasil/dampak.
   description: string;
   stack: string[];
-  url: string;
+  // Link live. Kosong kalau tidak ada versi publik (app Android, situs internal).
+  url?: string;
+  // Hanya isi kalau repo-nya PUBLIC — repo private akan 404 untuk pengunjung.
   repoUrl?: string;
+  // Catatan kecil kalau tidak ada link sama sekali, mis. "Private repository".
+  note?: string;
   // Screenshot di public/projects/. Kalau gambarnya lebih tinggi dari bingkai
   // 16:10 (screenshot full-page), preview-nya otomatis "nge-scroll" saat
   // kartu di-hover / dibuka. Kosong = tampil placeholder.
@@ -158,6 +163,32 @@ export type Project = {
 };
 
 export const projects: Project[] = [
+  {
+    id: "ronda",
+    title: "RONDA",
+    category: "Hackathon · Android",
+    year: "2026",
+    description:
+      "Android guardian app that scores every newly installed app on-device, blocks risky sideloaded APKs, and sends the decision to a trusted family member instead of the person being scammed. Top 30 at HackNusa 2026 (Human-Centric Security track), built with Axeleon and Malik.",
+    stack: ["Kotlin", "Jetpack Compose", "Firebase"],
+    repoUrl: "https://github.com/angseleong/RONDA",
+    // Slide pilihan dari pitch deck (cover → arsitektur), disusun vertikal
+    image: { src: "/projects/full/ronda.jpg", width: 1440, height: 4860 },
+    status: "TOP 30",
+    featured: true,
+  },
+  {
+    id: "oskm",
+    title: "OSKM ITB 2026",
+    category: "Event Website",
+    year: "2026",
+    description:
+      "Public website for ITB's 2026 student orientation — countdown, event timeline, merchandise, sponsors, and a weather overlay. I built the public shell and the home page sections inside a 28-person monorepo team (KAT ITB 2026, Information Division).",
+    stack: ["React", "TanStack Router", "Tailwind CSS", "Vite"],
+    note: "Private repository · site no longer online",
+    image: { src: "/projects/full/oskm.jpg", width: 1440, height: 5400 },
+    featured: true,
+  },
   {
     id: "titikatm",
     title: "titikATM",
@@ -209,6 +240,29 @@ export const projects: Project[] = [
     featured: true,
   },
   {
+    id: "makalah-matdis",
+    title:
+      "Graph and Combinatorial Analysis of Basketball Passing Networks: The Steph Curry Effect on the Golden State Warriors' Motion Offense",
+    category: "Paper",
+    year: "2026",
+    description:
+      "Discrete Mathematics paper using weighted directed graphs and combinatorics on NBA passing data (2021/22).",
+    stack: ["Python", "Graph Theory"],
+    url: "https://github.com/dhanesmd3/makalah-matdis-13525034",
+    featured: false,
+  },
+  {
+    id: "uno-prolog",
+    title: "UNO Card Game in Prolog",
+    category: "Course Project",
+    year: "2026",
+    description:
+      "Command-line UNO-style card game for 2–4 players, written in GNU Prolog for the Computational Logic course.",
+    stack: ["GNU Prolog"],
+    url: "https://github.com/dhanesmd3/IF1221_G29_MacMiniHaji",
+    featured: false,
+  },
+  {
     id: "kualitas-air",
     title: "Water Quality Calculator",
     category: "Course Project",
@@ -246,75 +300,134 @@ export const projects: Project[] = [
   },
 ];
 
-// ─── Experience & Achievements ───────────────────────────────────────────
+// ─── Experience, Education & Achievements ────────────────────────────────
+// Sumber: profil LinkedIn (Profile.pdf, Oktober 2026).
 
 export type ExperienceKind =
-  "Education" | "Organization" | "Committee" | "Freelance";
+  "Organization" | "Community" | "Committee" | "Work";
 
 export type Experience = {
   kind: ExperienceKind;
   role: string;
   organization: string;
   period: string;
+  // Boleh kosong. Isi 1–3 poin hasil kerja kalau ada.
   highlights: string[];
 };
 
-// Urutkan dari yang terbaru.
+// Urutkan dari yang terbaru. Timeline menampilkan beberapa teratas dulu,
+// sisanya muncul lewat tombol "Show earlier".
 export const experiences: Experience[] = [
   {
-    kind: "Education",
-    role: "Informatics Engineering",
-    organization: "Institut Teknologi Bandung (ITB)",
-    period: "2025 — Now",
-    highlights: [
-      // TODO: ganti dengan fokus studi, mata kuliah relevan, atau IPK (kalau mau)
-      "[Focus area, relevant coursework, or GPA]",
-    ],
-  },
-  {
-    // TODO: isi kepanitiaan (mis. tim web OGG FITB ITB 2026 — kalau memang iya)
-    kind: "Committee",
-    role: "[Your role]",
-    organization: "[Event or committee name]",
-    period: "[Year]",
-    highlights: [
-      "[What you built or handled, with a result if possible]",
-      "[Second highlight]",
-    ],
-  },
-  {
-    // TODO: isi organisasi / unit kegiatan
     kind: "Organization",
-    role: "[Your role]",
-    organization: "[Organization name]",
-    period: "[Year — Year]",
-    highlights: ["[What you did there]"],
+    role: "Club and Hobbies Intern",
+    organization: "Himpunan Mahasiswa Informatika (HMIF) ITB",
+    period: "Sep 2026 — Now",
+    highlights: [], // TODO: tambah poin kalau ada
+  },
+  {
+    kind: "Organization",
+    role: "Media Intelligence Associate",
+    organization: "Inkubator IT",
+    period: "Aug 2026 — Now",
+    highlights: [], // TODO: tambah poin kalau ada
+  },
+  {
+    kind: "Community",
+    role: "Website Developer Explorer",
+    organization: "Google Developer Groups on Campus ITB",
+    period: "Jul 2026 — Now",
+    highlights: [], // TODO: tambah poin kalau ada
+  },
+  {
+    kind: "Committee",
+    role: "Frontend Developer",
+    organization: "OSKM ITB 2026",
+    period: "Jun 2026 — Oct 2026",
+    highlights: [
+      "Built the public site's shell and home page sections (countdown, timeline, content) in a 28-person monorepo team.",
+    ],
+  },
+  {
+    kind: "Work",
+    role: "Web Developer",
+    organization: "Takooni",
+    period: "Jun 2026 — Jul 2026",
+    highlights: ["Built the product landing page — takooni.com."],
+  },
+  {
+    kind: "Committee",
+    role: "Social Night Division Committee",
+    organization: "The Sandbox 3.0 by IEEE ITB",
+    period: "Jan 2026 — May 2026",
+    highlights: [], // TODO: tambah poin kalau ada
+  },
+  {
+    kind: "Committee",
+    role: "IT Division Committee",
+    organization: "OGG FITB ITB 2026",
+    period: "Jan 2026 — Mar 2026",
+    highlights: [
+      "Built and shipped the official competition website — oggitb.com.",
+    ],
+  },
+  {
+    kind: "Work",
+    role: "Website Developer",
+    organization: "QuaCompute.id",
+    period: "Dec 2025 — Jan 2026",
+    highlights: ["Built the community website — quacompute.id."],
+  },
+  {
+    kind: "Work",
+    role: "Social Media Manager",
+    organization: "Dubius: Knowledge Museum",
+    period: "Mar 2022 — May 2022",
+    highlights: [
+      "Created and managed content across Dubius' social media channels.",
+    ],
+  },
+];
+
+export type Education = {
+  school: string;
+  degree: string;
+  period: string;
+};
+
+export const education: Education[] = [
+  {
+    school: "Institut Teknologi Bandung (ITB)",
+    degree: "Informatics Engineering",
+    period: "2025 — 2029",
+  },
+  {
+    school: "SMA Negeri 28 Jakarta",
+    degree: "Math & Science",
+    period: "2022 — 2025",
   },
 ];
 
 export type Achievement = {
   title: string;
-  issuer: string;
+  issuer?: string;
   year: string;
   url?: string;
 };
 
 export const achievements: Achievement[] = [
   {
-    // TODO: isi hasilnya (Participant / Finalist / Winner ...)
-    title: "PIDI – DIGDAYA x Hackathon 2026 · [Result]",
-    issuer: "Bank Indonesia & OJK",
+    title: "Absolute Winner — Indonesian National Mathematics Olympiad (INMO)",
+    year: "2024",
+  },
+  {
+    title: "1st Place, Mathematics — Olimpiade Nasional (OLNAS)",
+    year: "2024",
+  },
+  {
+    title: "Top 30 Team — HackNusa 2026",
+    issuer: "Telkom University Hackathon · Human-Centric Security track",
     year: "2026",
-  },
-  {
-    title: "[Competition or award name]",
-    issuer: "[Organizer]",
-    year: "[Year]",
-  },
-  {
-    title: "[Certificate or award name]",
-    issuer: "[Issuer]",
-    year: "[Year]",
   },
 ];
 
@@ -326,10 +439,8 @@ export type GalleryItem = {
   alt: string;
   // 1–3 kata, mis. "Futsal", "Hiking", "Coffee".
   caption: string;
-  // Info tipis yang muncul di bawah foto saat foto diklik.
+  // Info yang muncul saat kartu dibuka (1–2 kalimat).
   description: string;
-  // big = 2×2, wide = 2×1, tall = 1×2, kosong = 1×1
-  span?: "big" | "wide" | "tall";
 };
 
 export const beyondIntro = {
@@ -338,45 +449,10 @@ export const beyondIntro = {
   body: "[One or two sentences about what you do when you're not coding — sports, places, people, things that keep you curious.]",
 };
 
-// TODO: ganti dengan 6–9 foto hobi. Urutan + span ini sudah pas tanpa lubang
-// di grid 4 kolom (desktop) maupun 2 kolom (mobile).
-export const gallery: GalleryItem[] = [
-  {
-    alt: "Hobby photo 1",
-    caption: "[Hobby]",
-    description: "[Where, when, or why it matters — one short line.]",
-    span: "big",
-  },
-  {
-    alt: "Hobby photo 2",
-    caption: "[Hobby]",
-    description: "[Where, when, or why it matters — one short line.]",
-    span: "tall",
-  },
-  {
-    alt: "Hobby photo 3",
-    caption: "[Hobby]",
-    description: "[Where, when, or why it matters — one short line.]",
-  },
-  {
-    alt: "Hobby photo 4",
-    caption: "[Hobby]",
-    description: "[Where, when, or why it matters — one short line.]",
-  },
-  {
-    alt: "Hobby photo 5",
-    caption: "[Hobby]",
-    description: "[Where, when, or why it matters — one short line.]",
-    span: "wide",
-  },
-  {
-    alt: "Hobby photo 6",
-    caption: "[Hobby]",
-    description: "[Where, when, or why it matters — one short line.]",
-  },
-  {
-    alt: "Hobby photo 7",
-    caption: "[Hobby]",
-    description: "[Where, when, or why it matters — one short line.]",
-  },
-];
+// TODO: ganti dengan foto & cerita hobi kamu. Kartu disusun melingkar
+// (ring 3D), jadi 8–12 item paling bagus.
+export const gallery: GalleryItem[] = Array.from({ length: 8 }, (_, i) => ({
+  alt: `Hobby photo ${i + 1}`,
+  caption: "[Hobby]",
+  description: "[Where, when, or why it matters — one or two short lines.]",
+}));

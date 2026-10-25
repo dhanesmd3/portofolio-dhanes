@@ -137,25 +137,32 @@ export function ProjectCard({ project, isOpen, onToggle }: ProjectCardProps) {
 
             <TagList tags={project.stack} className="mt-4" />
 
-            <div className="mt-5 flex gap-5">
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={textLink}
-              >
-                Visit site
-                <span className="sr-only">
-                  {" "}
-                  — {project.title} (opens in new tab)
+            <div className="mt-5 flex flex-wrap items-center gap-5">
+              {project.url && (
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={textLink}
+                >
+                  Visit site
+                  <span className="sr-only">
+                    {" "}
+                    — {project.title} (opens in new tab)
+                  </span>
+                  <ArrowUpRight
+                    size={14}
+                    strokeWidth={1.5}
+                    className={nudge.upRight}
+                    aria-hidden="true"
+                  />
+                </a>
+              )}
+              {project.note && (
+                <span className={cn(labelClass, "text-muted")}>
+                  {project.note}
                 </span>
-                <ArrowUpRight
-                  size={14}
-                  strokeWidth={1.5}
-                  className={nudge.upRight}
-                  aria-hidden="true"
-                />
-              </a>
+              )}
               {project.repoUrl && (
                 <a
                   href={project.repoUrl}

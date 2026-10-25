@@ -43,9 +43,9 @@ export const viewport: Viewport = {
   ],
 };
 
-// Jalan sebelum halaman ke-render: pasang tema yang tersimpan supaya
-// tidak ada "kedip" tema yang salah saat reload.
-const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}})()`;
+// Jalan sebelum halaman ke-render: pasang tema & tampilan (Full/Compact)
+// yang tersimpan supaya tidak ada "kedip" yang salah saat reload.
+const themeScript = `(function(){try{var d=document.documentElement,t=localStorage.getItem("theme"),v=localStorage.getItem("view");if(t==="light"||t==="dark")d.dataset.theme=t;if(v==="full"||v==="compact")d.dataset.view=v}catch(e){}})()`;
 
 export default function RootLayout({
   children,
@@ -56,6 +56,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-theme="dark"
+      data-view="full"
       suppressHydrationWarning
       className={`${schibsted.variable} ${plexMono.variable}`}
     >

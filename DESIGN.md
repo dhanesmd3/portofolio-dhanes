@@ -7,18 +7,21 @@
 
 ## Lineage
 
-This system blends three references. Each one contributes something specific:
+This system blends five references. Each one contributes something specific:
 
 | Source | What we take |
 |---|---|
 | **Hyperstudio** (Refero style) | The visual language: near-black canvas, 1px hairline structure, weight-400 display type with negative tracking, no shadows, white pill for primary actions, outlined icons, a pulse-green dot for live status, slow editorial section rhythm. |
 | **farrel.me** | Content density and proof. Projects in a horizontal **carousel** of cards, small status badges (NEW / LIVE), outcome-driven one-liners, a compact Achievements list (title · issuer · year). |
+| **newminds.studio** | The **liquid glass** layer: a floating pill header, frosted panels (blur + saturate, translucent fill, hairline border, a bright inset highlight on the top edge, soft deep shadow), and light that reacts to the cursor. |
+| **velmax.llc** ("What's going on the shelf") | The **3D ring** for Beyond Tech: cards on a tilted ring that rotates on its own, can be dragged with inertia or stepped with ←/→, and opened for details. |
 | **wisee.info** | Structure and personality. Sticky header with anchor links, hero with two CTAs and a portrait, grouped tech stack, **numbered** experience timeline, a personal photo gallery with one-word captions, light/dark toggle. |
 
 **Where we break from Hyperstudio, on purpose:**
 - **Photography is allowed in three places only:** the hero portrait, project screenshots, and the Beyond Tech gallery. It always gets a disciplined treatment (fade mask, hairline frame, grayscale).
 - **There's one personal accent, Blueprint Blue** (`#4a7be3` dark / `#1e47b8` light). It replaces Hyperstudio's dim Compass Gold, but follows the same rule: it marks things, it never fills them. Neutrals are tilted slightly cool (navy-black) to sit with it.
-- **The page has a quiet backdrop** (blueprint grid + slow blue glow + grain) instead of a flat canvas. See *Backdrop*.
+- **The page has a quiet backdrop** (blueprint grid + slow blue glow + grain) instead of a flat canvas, and a **light that follows the cursor**. See *Backdrop*.
+- **Floating surfaces are liquid glass** (from newminds): header, tool grid, experience side panel, contact form, ring detail, buttons and badges. Glass gets a 20px radius and a soft shadow; everything else keeps Hyperstudio's flat hairline rules.
 - **A light theme exists.** Every token has a light value.
 - **The header is sticky.**
 
@@ -43,6 +46,12 @@ Components use **semantic tokens** only (`bg-canvas`, `text-fg`, `text-muted`, `
 | `--action-bg` | `#ffffff` Signal White | `#10131a` | Primary pill button fill. |
 | `--action-fg` | `#0b0d12` | `#ffffff` | Primary pill button text. |
 | `--overlay` | `rgb(7 8 12 / 0.92)` | `rgb(244 246 249 / 0.92)` | Mobile menu backdrop. |
+| `--glass-fill` | `rgb(13 16 24 / 0.58)` | `rgb(255 255 255 / 0.55)` | Translucent fill of glass surfaces. |
+| `--glass-border` | `rgb(255 255 255 / 0.10)` | `rgb(16 19 26 / 0.09)` | 1px edge of glass surfaces. |
+| `--glass-highlight` | `rgb(255 255 255 / 0.09)` | `rgb(255 255 255 / 0.85)` | Inset 1px highlight on the top edge (the "wet" look). |
+| `--glass-shadow` | `0 18px 70px -24px rgb(0 0 0 / .65)` | `0 18px 60px -28px rgb(16 19 26 / .28)` | Soft lift under glass. |
+| `--sheen` | `rgb(255 255 255 / 0.07)` | `rgb(255 255 255 / 0.55)` | Cursor-following highlight inside glass. |
+| `--mx` / `--my` | cursor position (px) | — | Written by `PointerTracker`; default `50vw 18vh`. |
 
 Contrast is checked: `--muted` on `--canvas` is ≈7.2:1 in dark and ≈5.3:1 in light; `--accent` passes 4.5:1 for small numerals in both themes (≈4.8:1 dark, ≈7.3:1 light).
 
@@ -93,15 +102,17 @@ Use `clamp()` for `display`, `display-xl` and `heading-lg` so they scale smoothl
 | Element | Value |
 |---|---|
 | Tags, badges, caption chips | `4px` radius |
-| Cards, image frames, inputs, ghost buttons, gallery tiles | `8px` radius |
-| Primary buttons, icon buttons | `9999px` (pill / circle) |
+| Cards, image frames, inputs | `8px` radius (`rounded-card`) |
+| Glass panels (tool grid, side panel, form, ring cards, ring detail) | `20px` radius (`rounded-glass`) |
+| Ring card image well | `12px` radius |
+| Header, all buttons, badges, kind tags | `9999px` (pill / circle) |
 | Content max-width | `1200px`, centered |
 | Text measure | `640px` max |
 | Page gutter | 24px desktop · 20px tablet · 16px mobile |
 | Section padding (vertical) | 160px desktop · 112px tablet · 80px mobile |
 | Card / frame padding | 32px desktop · 24px mobile |
 | Element gap | 20–24px |
-| Header height | 64px |
+| Header | 56px pill, floating 12px from the top |
 
 Grid: 12 columns, 24px gap on desktop. Breakpoints follow Tailwind defaults (`sm 640`, `md 768`, `lg 1024`, `xl 1280`).
 
@@ -109,12 +120,11 @@ Grid: 12 columns, 24px gap on desktop. Breakpoints follow Tailwind defaults (`sm
 
 ## Elevation & Surfaces
 
-**No drop shadows. Anywhere.** Elevation comes from three things only:
-1. **Hairlines:** a 1px `--line` around or between things.
-2. **Contrast:** the primary pill is the only bright filled shape on the page.
-3. **Blur:** the sticky header (after scroll), the mobile menu, and gallery info strips use `backdrop-filter: blur(12px)` over `--canvas` / `--overlay`.
+Two kinds of surface:
+1. **Flat (Hyperstudio):** sections, timeline rows, archive rows, project images. No fill, no shadow; structure is 1px `--line` rules. **The line is the layout.**
+2. **Liquid glass (newminds):** surfaces that float above the page. `glass` utility = translucent `--glass-fill` + `backdrop-filter: blur(18px) saturate(1.5)` + 1px `--glass-border` + inset top highlight `--glass-highlight` + `--glass-shadow`. Its first background layer is a 420px radial `--sheen` positioned at the cursor with `background-attachment: fixed`, so every glass panel catches the same light where the pointer is. `glass-chip` is the lighter version for buttons, badges and tags (blur 12px, no shadow, no sheen).
 
-The page background never changes between sections (the Backdrop is fixed to the viewport, not to sections). Sections are separated by a 1px `--line` rule at the top of each section header. **The line is the layout.**
+The page background never changes between sections (the Backdrop is fixed to the viewport, not to sections). Only glass casts a shadow.
 
 ---
 
@@ -129,10 +139,11 @@ The page background never changes between sections (the Backdrop is fixed to the
 
 - **Reveal:** `opacity 0 → 1`, `y 12px → 0`, staggered 80ms, once per element (Motion `whileInView`, `viewport={{ once: true, amount: 0.2 }}`).
 - **Hover:** color and border shifts, image `scale(1.03)`, arrow glyph nudge 2px. Nothing jumps.
-- **Allowed loops:** the pulse on the `--live` dot, and the Backdrop glows drifting over 26–34s.
+- **Allowed loops:** the pulse on the `--live` dot, the Backdrop glows drifting over 26–34s, and the Beyond Tech ring's slow auto-rotation (≈1 turn/min, pauses on hover, drag or open).
+- **Cursor light:** `PointerTracker` eases `--mx/--my` toward the pointer (18% per frame, stops when settled). Reduced motion → it jumps without easing.
 - **One-time flourish:** the hero nickname highlight (see Hero).
-- **Not allowed:** parallax, cursor followers, scroll-jacking, typing effects, marquees that can't be paused.
-- `prefers-reduced-motion: reduce` disables reveals, image scale, and the pulse. Color transitions stay.
+- **Not allowed:** parallax, custom cursors, scroll-jacking, typing effects, marquees that can't be paused.
+- `prefers-reduced-motion: reduce` disables reveals, image scale, the pulse and the ring auto-rotation (dragging still works, and steps jump instead of ease). Color transitions stay.
 
 ---
 
@@ -152,9 +163,9 @@ Photography only appears in the three places listed under Lineage, and always wi
 
 | Where | Treatment |
 |---|---|
-| **Hero portrait** | Background removed (transparent PNG/WebP), **grayscale(100%) contrast(1.05)**, bottom **fade mask** (variant A), floating over a **dot field**. No frame, no border, no radius. |
+| **Hero portrait** | `profile.jpg`, **natural color** lightly muted (`saturate(0.9) contrast(1.04) brightness(0.97)`), cropped to head & shoulders (`scale(1.18)`, origin top). Sits in a **framed card**: 4:5, 28px radius, 1px `--line` border, `--carbon` well. Bottom **fade mask** (variant A, from 58%) dissolves the photo *and* its frame into the page. Dot field behind. **No glow, no grayscale.** |
 | **Project screenshots** | Full color, 16:10, inside an 8px-radius frame with a 1px `--line` border on a `--carbon` well. |
-| **Beyond Tech gallery** | Grayscale by default, color on hover (only on `@media (hover: hover)` devices; touch devices show color). 8px radius, 1px `--line`. |
+| **Beyond Tech ring** | Full color, 4:5, `object-cover`, inside the ring card's 12px-radius well; `draggable={false}` so drags rotate the ring. |
 
 Always use `next/image` with an accurate `alt` and correct `sizes`. The hero portrait gets `preload` (`priority` is deprecated in Next.js 16).
 
@@ -162,14 +173,24 @@ Always use `next/image` with an accurate `alt` and correct `sizes`. The hero por
 
 ## Components
 
-### Top Navigation (sticky)
+### Top Navigation (floating glass pill)
 **Role:** Persistent header with wordmark, anchors, theme toggle, CTA.
 
-64px tall, content max-width 1200px. At the top of the page it's transparent. After scrolling 8px it becomes `--canvas` at 80% opacity with `backdrop-blur(12px)` and a 1px `--line` bottom border (300ms transition).
+`fixed`, 12px from the top, inside the 1200px column: a 56px-tall **`glass` pill** (`rounded-full`), 20px left padding, 8px right. Always glass (no scroll state).
 - **Left:** wordmark "Dhanesworo" in sans 18px 400 `--fg`.
-- **Center:** ABOUT · PROJECTS · EXPERIENCE · BEYOND TECH · CONTACT, in mono `label` `--muted`, 24px gaps. Hover → `--fg`. **Active section:** `--fg` with a 4px `--accent` dot before the label (uses `hooks/useActiveSection.ts`).
-- **Right:** theme toggle (Icon Button) + outlined pill "LET'S CONNECT ↗" (transparent, 1px `--fg` border, 9999px, 8px 16px, mono 12px uppercase).
-- **Mobile (<768px):** wordmark + toggle + a menu Icon Button. The menu opens a full-screen `--overlay` with blur, links stacked at `heading` size, staggered in.
+- **Center (≥1024px):** ABOUT · PROJECTS · EXPERIENCE · BEYOND TECH · CONTACT, in mono `label` `--muted`, 24px gaps. Hover → `--fg`. **Active section:** `--fg` with a 4px `--accent` dot before the label (uses `hooks/useActiveSection.ts`).
+- **Right:** **View Toggle** (Full / Compact, ≥640px) + theme toggle (Icon Button) + **filled** pill "LET'S CONNECT" (`--action-bg` / `--action-fg`, mono 12px uppercase, 10px 16px; ≥768px).
+- **Mobile (<1024px):** wordmark + toggle + menu Icon Button. The menu is a full-screen `--overlay` with blur *behind* the pill (`-z-10`, 80px top padding), links stacked at `heading` size, staggered in, then a "LAYOUT" row with the View Toggle. Esc closes it and page scroll is locked while open.
+- Links follow the active view: Full → `#about`…, Compact → `#c-about`…; "Beyond Tech" (`inCompact: false`) is hidden in Compact.
+
+### View Modes (Full / Compact)
+**Role:** Full is the editorial portfolio. **Compact** is a one-page, resume-style view for recruiters: everything they need, nothing decorative.
+
+- **Mechanics:** like the theme. `data-view="full|compact"` on `<html>`, persisted in `localStorage("view")`, applied by the inline `<head>` script before paint. Both views are rendered; CSS picks one via the `compact:` custom variant (`.compact:hidden` / `.hidden.compact:block`), so there's no flash and no hydration mismatch. Switching scrolls to the top. `hooks/useViewMode.ts` exposes the mode to client code.
+- **View Toggle:** segmented `glass-chip` pill with two mono `label` buttons (FULL / COMPACT, `aria-pressed`); the active one is filled `--fg` on `--canvas`. Active styling comes from CSS (`compact:` variant), not state.
+- **Compact layout** (`components/CompactView.tsx`, max 920px): profile block (96px round photo, name at `heading` with the nickname in `--accent`, tagline, bio, availability badge, location, Download CV + Email + LinkedIn/GitHub), then rows with a 1px `--line` top and a 180px mono label column: `01 / HIGHLIGHTS` (achievements) · `02 / EXPERIENCE` (all entries, role + period, org + kind, bullets) · `03 / PROJECTS` (featured: title link, category · year, description, stack; then "MORE" archive rows) · `04 / SKILLS` · `05 / EDUCATION` · `06 / CONTACT` (link rows + copy email).
+- **Left out of Compact:** the Beyond Tech ring, the contact form, the project carousel and screenshots, the hero portrait animation.
+- Section ids are prefixed `c-` so they never collide with Full.
 
 ### Theme Toggle
 36–40px Icon Button. Shows `Sun` in dark mode and `Moon` in light mode. `aria-label="Switch to light theme"` / `"Switch to dark theme"`. Sets `data-theme` on `<html>`, persists to `localStorage` (try/catch). An inline `<head>` script applies the stored theme before paint so there's no flash. Background, color and border transition over 200ms on theme switch.
@@ -182,10 +203,10 @@ Always use `next/image` with an accurate `alt` and correct `sizes`. The hero por
 ### Ghost Button
 **Role:** Secondary action next to a primary: **View projects →**.
 
-Transparent, 1px `--fg` border, **8px radius** (not a pill, which is what tells it apart from primary), 12px 20px padding, sans 14px 500 uppercase. Hover: background `--fg` at 6%.
+**Glass pill** (`glass-chip`, `rounded-full`), 12px 20px padding, sans 14px 500 uppercase. It's told apart from primary by fill: primary is solid, ghost is frosted. Hover: border `--line-strong`, background `--fg` at 6%.
 
 ### Icon Button
-40px circle, transparent, 1px `--line` border, icon 18px `--fg`. Hover: border `--line-strong`. Disabled: 40% opacity. Used for carousel arrows, theme toggle, menu.
+40px **glass** circle (`glass-chip`), icon 18px `--fg`. Hover: border `--line-strong`. Disabled: 40% opacity. Used for carousel and ring arrows, theme toggle, menu, close.
 
 ### Text Link
 `--fg`, no underline at rest. On hover: 1px underline, 4px offset, plus the `↗` glyph nudging up-right. In body copy, links are always underlined (1px, `--line-strong` → `--fg` on hover).
@@ -193,7 +214,7 @@ Transparent, 1px `--fg` border, **8px radius** (not a pill, which is what tells 
 ### Status Badge
 **Role:** Live / availability / project status. Examples: "Currently building QuaCompute", "LIVE", "NEW", "HACKATHON".
 
-`--raised` background, 1px `--line` border, 4px radius, 6px 12px padding, mono `label` `--muted`. **Live variant:** a 6px `--live` dot prefix with a soft pulse (scale 1 → 1.8 ring fading out, 2s loop). Only "Currently…" and "LIVE" get the dot.
+Glass pill (`glass-chip`, `rounded-full`), 6px 12px padding, mono `label` `--muted`. **Live variant:** a 6px `--live` dot prefix with a soft pulse (scale 1 → 1.8 ring fading out, 2s loop). Only "Currently…" and "LIVE" get the dot.
 
 ### Tag (tech stack)
 Transparent, 1px `--line`, 4px radius, 4px 8px padding, mono 12px `--muted`. Never filled, never colored.
@@ -228,7 +249,10 @@ opacity: 0.7;
 2. **Glows:** two soft radial gradients of `--accent` at 22% (`accent-glow` utility): one wide at the top, one smaller bottom-right at 60% opacity. Each drifts slowly (`drift` keyframes, 26s / 34s, alternate). Radial gradients, not `filter: blur`, so it stays cheap.
 3. **Grain:** SVG fractal noise at 3.5% opacity, `mix-blend-mode: overlay`.
 
-Content panels that need to read as solid (tool grid cells) use `bg-canvas` and cover it.
+4. **Cursor light:** a 560px radial of `--accent` at 18% centered on `--mx/--my` (`cursor-light`).
+5. **Cursor grid:** a second blueprint grid at 32% `--accent`, masked to a 240px circle around the cursor (`cursor-grid`), so the blueprint "lights up" where the pointer is.
+
+`PointerTracker` (client, renders nothing) lives inside `Backdrop` and writes `--mx/--my` on `<html>`. On touch devices the light rests where the last touch was.
 
 ### Hero (Profile) — `#about`
 Viewport-tall minus header (`min-h-[calc(100svh-64px)]`), content vertically centered, no section header.
@@ -240,15 +264,15 @@ Viewport-tall minus header (`min-h-[calc(100svh-64px)]`), content vertically cen
   3. Bio at `body` `--muted`, max 560px, 2–3 sentences
   4. CTA row: Primary Pill "Download CV ↓" + Ghost "View projects →", 12px gap
   5. Meta row: mono `label` `--muted`: `BANDUNG, ID` · GitHub · LinkedIn · Email icon links (20px)
-- **Portrait:** 4:5 ratio, grayscale, fade mask variant A, Dot Field behind it.
+- **Portrait:** framed 4:5 card (28px radius, hairline border), natural color, fade mask variant A, Dot Field behind it (see Imagery).
   ```css
-  mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 58%, transparent 100%);
   ```
 - Elements reveal with a staggered 80ms fade-up on load.
 - **Nickname highlight:** the name is split into `profile.nickname` ("Dhanes") + the rest ("woro Muhammad Datiputro"), with no space between them so the word never breaks. ~1.1s after load, the nickname turns `--accent` and an underline (0.07em, `--accent`) draws left → right, while the rest dims to `--muted`. Pure CSS (`.hero-nick` / `.hero-name-rest` in `globals.css`); reduced motion jumps straight to the end state.
 
 ### Tool Grid — `#tools`
-Hyperstudio's 2×2 service grid, repurposed. A bordered frame (1px `--line`, 8px radius) split into **4 cells** by internal 1px `--line` dividers: 2×2 on desktop and tablet, stacked on mobile. Each cell has 32px padding.
+Hyperstudio's 2×2 service grid inside a **glass panel** (`glass`, 20px radius), split into **4 cells** by 1px `--line` borders between cells: 2×2 on tablet and desktop, stacked on mobile. Each cell has 32px padding.
 - Top-left: compass icon 24px in `--accent` (`Code2` Languages, `LayoutTemplate` Frontend, `Database` Backend & Data, `GitBranch` Workflow)
 - Group name: mono `label` `--fg`, margin-top 16px
 - Then a wrap row of **tool items**: monochrome logo 16px + name in sans 14px `--muted`, 16px gaps. On hover the logo and name turn `--fg`.
@@ -273,7 +297,7 @@ No card background, no outer border. Only the image is framed and the content si
 **Revealed when open** (grid-rows `0fr → 1fr`, 500ms; content fades in 150ms later; `inert` while closed)
 4. **Description:** `body-sm` `--muted`, full text, leading with the outcome
 5. **Tags row:** Tags, 8px gap
-6. **Links row:** Text Links "Visit site ↗" / "Code ↗"
+6. **Links row:** Text Links "Visit site ↗" (if `url`) / "Code ↗" (only for **public** repos). Projects with neither show `note` in mono `label` `--muted` (e.g. "PRIVATE REPOSITORY · SITE NO LONGER ONLINE").
 
 **Scrolling preview:** projects store `image: { src, width, height }`. If the screenshot is taller than the 16:10 frame (full-page captures in `public/projects/full/`), it renders at full width and, on hover **or** while the card is open, translates to `calc(-100% + 100cqh)`, so the whole page scrolls past inside the frame. Duration scales with height (`ratio × 2.2s`, clamped 3–12s) so speed feels constant; it returns in 700ms. A "↓ PREVIEW" chip (bottom-right) hints at it and hides while active. Screenshots that already fit use `object-cover object-left-top` and a 1.03 zoom instead.
 
@@ -286,34 +310,36 @@ Below the carousel, a mono `label` "ARCHIVE" followed by rows separated by 1px `
 - **Hover:** title shifts 4px right, `↗` turns `--accent`. The whole row is the link.
 
 ### Timeline Item (Experience) — `#experience`
-**Desktop:** Experience timeline in cols 1–7, Achievements in cols 9–12. **Mobile:** stacked.
+**Desktop:** timeline in cols 1–7; a sticky **glass side panel** (cols 8–12, `top: 96px`) holding Education then Achievements. **Mobile:** stacked.
+
+Data comes from LinkedIn. Newest first. The first **5** entries show; a glass-pill button "SHOW EARLIER (n)" reveals the rest (`aria-expanded`, chevron rotates).
 
 Each item: 1px `--line` top border, 24px vertical padding, 2-column grid:
-- **Left (120px):** index in mono `label` `--accent` (`01`), period below in mono `label` `--muted` (`2025 — NOW`)
-- **Right:** kind Tag (`EDUCATION` / `ORGANIZATION` / `COMMITTEE` / `FREELANCE`), role at `heading-sm` `--fg`, organization in `body` `--muted`, then 1–3 bullets in `body-sm` `--muted`, each prefixed with an en dash `–` (no dot bullets)
+- **Left (120px):** index in mono `label` `--accent` (`01`), period below in mono `label` `--muted` (`SEP 2026 — NOW`)
+- **Right:** kind pill (`glass-chip`: `ORGANIZATION` / `COMMUNITY` / `COMMITTEE` / `WORK`), role at `heading-sm` `--fg`, organization in `body` `--muted`, then 0–3 bullets in `body-sm` `--muted`, each prefixed with an en dash `–`
 
-### Achievement Row
-Mono `label` "ACHIEVEMENTS" above the list. Each row has a 1px `--line` top and 16px padding:
-- `Trophy` icon 16px `--accent` · title in sans 16px `--fg` · issuer in `body-sm` `--muted` below · year in mono `label` right-aligned
-- If there's a certificate, the whole row links to it with `↗`
+### Education & Achievement Rows (side panel)
+Mono `label` heading ("EDUCATION", "ACHIEVEMENTS"), then rows with a 1px `--line` top and 16px padding:
+- 16px `--accent` icon (`GraduationCap` / `Trophy`) · name in sans 16px `--fg` · degree or issuer in `body-sm` `--muted` below · period/year in mono `label` right-aligned
+- An achievement with a certificate links the whole row with `↗`
 
-### Beyond Tech Gallery — `#beyond`
-- **Intro:** Hyperstudio's manifesto block. Centered, max 600px, title at `heading`, one or two sentences at `body` `--muted`.
-- **Bento grid:** 4 columns desktop / 2 mobile, row height 200px desktop / 160px mobile, 16px gap. Tile spans come from data: `big` 2×2, `wide` 2×1, `tall` 1×2, default 1×1. Aim for 6–9 tiles with no holes.
-- **Tile = toggle button:** 8px radius, 1px `--line`, `overflow: hidden`, image `object-cover`, grayscale → color + `scale(1.03)` on hover or when open (600ms). One tile open at a time; clicking the open tile closes it. Open border → `--accent`.
-- **Caption chip:** bottom-left, 12px inset, `--canvas` at 70% + `backdrop-blur(8px)`, 4px radius, 4px 8px padding, mono `micro` `--fg`. **One to three words:** "FUTSAL", "HIKING", "COFFEE". Hides when the tile opens.
-- **Toggle mark:** 28px circle top-right, same chip style, `+` rotating to `×` when open.
-- **Info strip:** slides up from the bottom when open (translate-y 100% → 0, 500ms): 1px `--line` top, `--canvas` at 80% + `backdrop-blur(12px)`, 12px padding, caption in mono `micro` `--fg` + one line (`description`, max 2 lines) in `body-sm` `--muted`.
-- No lightbox.
+### Beyond Tech Ring — `#beyond`
+- **Intro:** Hyperstudio's manifesto block. Centered, max 600px, title at `heading`, one or two sentences at `body` `--muted`. Section header aside: "Drag the ring, then open any card…".
+- **Stage:** `perspective: 1700px`, origin `50% 40%`; height 320 / 520 / 640px (mobile / tablet / desktop). `touch-action: pan-y` (vertical page scroll still works on phones), `cursor: grab`.
+- **Ring math** (per frame, written straight to `style`, no React re-render): card *i* sits at angle θ = i·(2π/N) + rotation. `x = sin θ · R`, `z = cos θ · R`, `y = cos θ · R · 0.36` (front lower, back higher → tilted ring), `rotateY(sin θ · 24°)`. Opacity `0.2 + 0.8·depth^1.6`, `z-index` by depth. R = clamp(150, 36% of width, 400); card width = clamp(112, 16% of width, 184).
+- **Core:** a glass circle at the center with mono "AFK"; the front cards pass in front of it.
+- **Card:** 20px radius, `--raised` at 85% + `--glass-border` + inset highlight + `--glass-shadow` (no backdrop blur — eight moving blurred layers are too heavy). 4:5 image well (12px radius; placeholder = dot field + icon), then a mono `micro` row: index in `--accent`, caption in `--fg`.
+- **Motion:** auto-rotates ≈1 turn/min; pauses on hover, while dragging, while a card is open, and when off-screen (IntersectionObserver). Drag rotates with the pointer, then coasts with inertia (×0.93/frame) and **snaps** to the nearest card. ←/→ Icon Buttons step one card. A counter (`01 / 08 · DRAG OR OPEN A CARD`) sits between them.
+- **Open:** clicking a card (that wasn't a drag) brings it to the front and opens a **glass detail panel** centered over the stage: image (≥640px), `03 / 08` label, caption at `heading-sm`, description at `body` `--muted`, close Icon Button (focused on open). Esc, the close button, or clicking the dimmed stage closes it and returns focus to the card. Keyboard: Tab to a card rotates it to the front; Enter opens it.
 
 ### Contact — `#contact`
 **Desktop:** 2 columns (cols 1–5 info, cols 7–12 form). **Mobile:** stacked.
 - **Left:** headline "Let's connect." at `heading`, one line at `body` `--muted`, a live Status Badge ("OPEN TO INTERNSHIPS"), then **link rows** separated by 1px `--line`: mono `label` key (`EMAIL`, `LINKEDIN`, `GITHUB`, `INSTAGRAM`) on the left, value in sans 16px `--fg` + `↗` on the right. The email row also has a copy Icon Button that confirms with "COPIED" in mono for 2s.
-- **Right:** the form inside a frame (1px `--line`, 8px radius, 32px padding).
+- **Right:** the form inside a **glass panel** (20px radius, 32px padding).
 
 ### Form Field
 - **Label:** mono `label` `--muted`, 8px above the input
-- **Input / textarea:** `--carbon` background, 1px `--line-strong` border, 8px radius, 12px 14px padding, sans **16px** (prevents iOS zoom) `--fg`, placeholder `--muted` at 70%. Textarea min-height 160px, vertical resize only.
+- **Input / textarea:** `--carbon` at 60% background, 1px `--line-strong` border, 8px radius, 12px 14px padding, sans **16px** (prevents iOS zoom) `--fg`, placeholder `--muted` at 70%. Textarea min-height 160px, vertical resize only.
 - **Focus:** border `--fg`, no glow
 - **Error:** border `--danger`, message in sans 13px `--danger` below, linked with `aria-describedby`
 - **Honeypot:** visually hidden `website` input (`aria-hidden`, `tabIndex={-1}`, `autoComplete="off"`)
@@ -349,15 +375,16 @@ Same header and footer. Content centered in the column, `min-h-[70svh]`, with th
 - Test both themes and 360px width for every component.
 
 ### Don't
-- Never add drop shadows, glows, or gradient fills to components. (The Backdrop is the one place gradients live.)
+- Never add drop shadows or gradient fills to flat components. Only glass surfaces cast `--glass-shadow`; gradients live in the Backdrop and the glass sheen.
 - Never bold a heading (no 600/700/800).
 - Never use `--accent` for text paragraphs, backgrounds, or large shapes.
-- Never fully round cards, frames, or inputs. 8px is the max, and pills are for buttons only.
+- Never mix radii: flat frames and inputs are 8px, glass panels are 20px, buttons/badges are pills. Nothing else.
 - Never use brand-colored tech logos or multicolor icons.
 - Never put photography outside the hero, project screenshots, and the gallery.
 - Never use the banned fonts.
-- Never animate on loop (except the live dot and the Backdrop drift) or animate the page's scroll position.
-- Never break the 1200px column. Only the canvas and the mobile menu go full-bleed.
+- Never animate on loop (except the live dot, the Backdrop drift and the ring) or animate the page's scroll position.
+- Never break the 1200px column. Only the canvas, the mobile menu and the ring's outer cards (clipped by the section) go wider.
+- Never put `backdrop-filter` on many moving elements at once (performance).
 
 ---
 
@@ -396,6 +423,12 @@ Same header and footer. Content centered in the column, `min-h-[70svh]`, with th
   --action-bg: #ffffff;
   --action-fg: #0b0d12;
   --overlay: rgb(7 8 12 / 0.92);
+  /* Liquid glass */
+  --glass-fill: rgb(13 16 24 / 0.58);
+  --glass-border: rgb(255 255 255 / 0.1);
+  --glass-highlight: rgb(255 255 255 / 0.09);
+  --glass-shadow: 0 18px 70px -24px rgb(0 0 0 / 0.65);
+  --sheen: rgb(255 255 255 / 0.07);
 }
 
 :root[data-theme="light"] {
@@ -413,6 +446,12 @@ Same header and footer. Content centered in the column, `min-h-[70svh]`, with th
   --action-bg: #10131a;
   --action-fg: #ffffff;
   --overlay: rgb(244 246 249 / 0.92);
+  /* Liquid glass */
+  --glass-fill: rgb(255 255 255 / 0.55);
+  --glass-border: rgb(16 19 26 / 0.09);
+  --glass-highlight: rgb(255 255 255 / 0.85);
+  --glass-shadow: 0 18px 60px -28px rgb(16 19 26 / 0.28);
+  --sheen: rgb(255 255 255 / 0.55);
 }
 
 @theme inline {
