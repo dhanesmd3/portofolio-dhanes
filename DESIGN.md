@@ -177,11 +177,20 @@ Always use `next/image` with an accurate `alt` and correct `sizes`. The hero por
 **Role:** Persistent header with wordmark, anchors, theme toggle, CTA.
 
 `fixed`, 12px from the top, inside the 1200px column: a 56px-tall **`glass` pill** (`rounded-full`), 20px left padding, 8px right. Always glass (no scroll state).
-- **Left:** wordmark "Dhanesworo" in sans 18px 400 `--fg`.
+- **Left:** the **DMD monogram** (Logo, 22px tall), linking to the top; `aria-label` carries the full name.
 - **Center (≥1024px):** ABOUT · PROJECTS · EXPERIENCE · BEYOND TECH · CONTACT, in mono `label` `--muted`, 24px gaps. Hover → `--fg`. **Active section:** `--fg` with a 4px `--accent` dot before the label (uses `hooks/useActiveSection.ts`).
 - **Right:** **View Toggle** (Full / Compact, ≥640px) + theme toggle (Icon Button) + **filled** pill "LET'S CONNECT" (`--action-bg` / `--action-fg`, mono 12px uppercase, 10px 16px; ≥768px).
 - **Mobile (<1024px):** wordmark + toggle + menu Icon Button. The menu is a full-screen `--overlay` with blur *behind* the pill (`-z-10`, 80px top padding), links stacked at `heading` size, staggered in, then a "LAYOUT" row with the View Toggle. Esc closes it and page scroll is locked while open.
 - Links follow the active view: Full → `#about`…, Compact → `#c-about`…; "Beyond Tech" (`inCompact: false`) is hidden in Compact.
+
+### Logo (ᗡMD monogram)
+**Role:** the brand mark in the header and the browser tab.
+
+- **Form:** the initials **ᗡ M D** drawn as one monoline (stroke 3 on a 64×24 grid, round caps and joins). The **first D is mirrored**, so the mark is symmetric around the M. The D bowls are half-circles; the M has a centered V. Both Ds use `currentColor` (`--fg`); **the M is `--accent`** — the single colored note that makes it catch the eye.
+- **Motion:** on load each stroke draws in once (`pathLength=1`, dash offset 1 → 0, 0.9s, staggered D → M → D by 120ms). Reduced motion shows it fully drawn.
+- **Code:** `components/Logo.tsx` (header) · `app/icon.svg` (favicon: **transparent, square 64×64**, a **compact ligature** of the monogram — the M's legs double as the stems of both Ds, so ᗡ, M and D merge into one ≈48×48 symbol that stays legible at 16px; stroke 5.5; bowl strokes follow the browser theme via `prefers-color-scheme` (ink `#10131a` / `#eef1f6`), M `#2f62d6` / `#5a88ec`) · `app/apple-icon.png` (180px transparent, white Ds — iOS puts transparent icons on black) · `app/favicon.ico` (16/32/48 for older browsers, neutral `#8a93a8` Ds so it reads on light and dark tabs). The PNG/ICO are rendered from `icon.svg`; regenerate them if the SVG changes.
+- **Why two shapes:** three separate letters get ~4px each in a 16px tab and look squashed, so the favicon uses the ligature; the header (22px+) uses the spaced letters.
+- **Don't:** add a wordmark next to it, un-mirror the first D, recolor the Ds, or put it on a colored fill.
 
 ### View Modes (Full / Compact)
 **Role:** Full is the editorial portfolio. **Compact** is a one-page, resume-style view for recruiters: everything they need, nothing decorative.

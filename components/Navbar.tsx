@@ -8,6 +8,7 @@ import { navLinks, profile } from "@/lib/data";
 import { useActiveSection } from "@/hooks/useActiveSection";
 import { sectionIdFor, useViewMode } from "@/hooks/useViewMode";
 import { cn } from "@/lib/utils";
+import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 import { easeOutSoft } from "./Reveal";
 import { buttonStyles, labelClass } from "./ui";
@@ -57,9 +58,10 @@ export function Navbar() {
           <Link
             href={hrefFor("about")}
             onClick={closeMenu}
-            className="text-lg text-fg"
+            aria-label={`${profile.name} — home`}
+            className="-m-2 rounded-full p-2 text-fg transition-opacity duration-150 hover:opacity-80"
           >
-            {profile.wordmark}
+            <Logo className="h-[22px]" />
           </Link>
 
           <ul className="hidden items-center gap-6 lg:flex">

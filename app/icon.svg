@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Favicon: versi ringkas monogram ᗡMD. Kaki "M" sekaligus menjadi batang
+       kedua "D", jadi tiga huruf menyatu dalam satu bentuk yang hampir
+       persegi (±48×48) — tetap terbaca di ukuran tab 16px. Latar transparan;
+       warna lengkung D mengikuti tema browser, "M" biru. -->
+  <style>
+    .d { stroke: #10131a; }
+    .m { stroke: #2f62d6; }
+    @media (prefers-color-scheme: dark) {
+      .d { stroke: #eef1f6; }
+      .m { stroke: #5a88ec; }
+    }
+  </style>
+  <g fill="none" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <path class="d" d="M20 10a11 22 0 0 0 0 44"/>
+    <path class="d" d="M44 10a11 22 0 0 1 0 44"/>
+    <path class="m" d="M20 54V10l12 26 12-26v44"/>
+  </g>
+</svg>
