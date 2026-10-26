@@ -3,43 +3,47 @@
 import { useEffect } from "react";
 
 /**
- * Menyalin posisi kursor ke CSS variable --mx / --my di <html>, dengan
- * sedikit "lag" (lerp) supaya cahaya terasa mengalir, bukan menempel kaku.
- * Dipakai oleh cahaya latar (Backdrop) dan kilau panel kaca (.glass).
+ * Menyalin posisi kursor ke CSS variable --mx / --my pada elemen #backdrop,
+ * dengan sedikit "lag" (lerp) supaya cahaya terasa mengalir.
+ *
+ * Penting untuk performa: variable sengaja dipasang di #backdrop, BUKAN di
+ * <html>. Mengubah custom property di <html> memaksa browser menghitung
+ * ulang style seluruh halaman setiap frame — itu yang dulu bikin lag.
  * Tidak me-render apa pun.
  */
 export function PointerTracker() {
   useEffect(() => {
-    const root = document.documentElement;
+    const target = document.getElementById("backdrop");
+    if (!target) return;
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    const target = { x: window.innerWidth / 2, y: window.innerHeight * 0.18 };
-    const current = { ...target };
+    const goal = { x: window.innerWidth / 2, y: window.innerHeight * 0.18 };
+    const current = { ...goal };
     let frame = 0;
 
     const apply = () => {
-      root.style.setProperty("--mx", `${current.x.toFixed(1)}px`);
-      root.style.setProperty("--my", `${current.y.toFixed(1)}px`);
+      target.style.setProperty("--mx", `${current.x.toFixed(1)}px`);
+      target.style.setProperty("--my", `${current.y.toFixed(1)}px`);
     };
 
     const tick = () => {
       // Kejar target 18% per frame; berhenti kalau sudah cukup dekat
-      current.x += (target.x - current.x) * 0.18;
-      current.y += (target.y - current.y) * 0.18;
+      current.x += (goal.x - current.x) * 0.18;
+      current.y += (goal.y - current.y) * 0.18;
       apply();
       const settled =
-        Math.abs(target.x - current.x) < 0.5 &&
-        Math.abs(target.y - current.y) < 0.5;
+        Math.abs(goal.x - current.x) < 0.5 &&
+        Math.abs(goal.y - current.y) < 0.5;
       frame = settled ? 0 : requestAnimationFrame(tick);
     };
 
     const onPointerMove = (event: PointerEvent) => {
-      target.x = event.clientX;
-      target.y = event.clientY;
+      goal.x = event.clientX;
+      goal.y = event.clientY;
       if (reduceMotion) {
-        current.x = target.x;
-        current.y = target.y;
+        current.x = goal.x;
+        current.y = goal.y;
         apply();
         return;
       }

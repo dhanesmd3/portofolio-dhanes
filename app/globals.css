@@ -28,7 +28,6 @@
   --glass-border: rgb(255 255 255 / 0.1);
   --glass-highlight: rgb(255 255 255 / 0.09);
   --glass-shadow: 0 18px 70px -24px rgb(0 0 0 / 0.65);
-  --sheen: rgb(255 255 255 / 0.07);
 }
 
 :root[data-theme="light"] {
@@ -51,10 +50,11 @@
   --glass-border: rgb(16 19 26 / 0.09);
   --glass-highlight: rgb(255 255 255 / 0.85);
   --glass-shadow: 0 18px 60px -28px rgb(16 19 26 / 0.28);
-  --sheen: rgb(255 255 255 / 0.55);
 }
 
-/* Posisi kursor (diisi PointerTracker). Default: tengah atas layar. */
+/* Posisi kursor. Default di sini; PointerTracker menimpanya HANYA di
+   elemen #backdrop (bukan <html>) supaya browser tidak menghitung ulang
+   style seluruh halaman setiap kali kursor bergerak. */
 :root {
   --mx: 50vw;
   --my: 18vh;
@@ -201,18 +201,10 @@
 }
 
 /* Liquid glass: panel kaca buram + garis tepi tipis + kilau di tepi atas.
-   Lapisan pertama = kilau yang mengikuti kursor (background-attachment
-   fixed → posisinya relatif ke layar, jadi semua panel kaca "menangkap"
-   cahaya yang sama di titik kursor). */
+   Backdrop blur itu mahal — pakai hanya untuk permukaan besar yang
+   mengambang (header, panel), bukan untuk elemen kecil. */
 @utility glass {
-  background:
-    radial-gradient(
-        420px circle at var(--mx) var(--my),
-        var(--sheen),
-        transparent 70%
-      )
-      fixed,
-    var(--glass-fill);
+  background: var(--glass-fill);
   border: 1px solid var(--glass-border);
   box-shadow:
     inset 0 1px 0 0 var(--glass-highlight),
@@ -221,13 +213,12 @@
   -webkit-backdrop-filter: blur(18px) saturate(1.5);
 }
 
-/* Varian ringan untuk elemen kecil (badge, tombol, chip) */
+/* Varian ringan untuk elemen kecil (badge, tombol, chip): tampilan kaca
+   tanpa backdrop blur — puluhan blur kecil sekaligus bikin halaman berat. */
 @utility glass-chip {
   background: var(--glass-fill);
   border: 1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 0 var(--glass-highlight);
-  backdrop-filter: blur(12px) saturate(1.4);
-  -webkit-backdrop-filter: blur(12px) saturate(1.4);
 }
 
 /* Cahaya biru yang mengikuti kursor (lapisan Backdrop) */
@@ -311,6 +302,42 @@
 
 .hero-name-rest {
   animation: name-dim 0.8s var(--ease-out-soft) 1.1s both;
+}
+
+/* Kolom foto AFK yang bergulir tanpa henti. Isi kolom diulang dua kali,
+   jadi menggeser tepat setengah tinggi (+ setengah gap 1rem) = loop mulus.
+   Hanya transform → dikerjakan GPU, ringan. */
+@keyframes afk-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-50% - 0.5rem));
+  }
+}
+
+@keyframes afk-down {
+  from {
+    transform: translateY(calc(-50% - 0.5rem));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.afk-track {
+  animation: afk-up var(--afk-duration, 60s) linear infinite;
+  will-change: transform;
+}
+
+.afk-track[data-dir="down"] {
+  animation-name: afk-down;
+}
+
+/* Berhenti saat kolom di-hover, atau saat tombol Pause ditekan */
+.afk-col:hover .afk-track,
+[data-paused="true"] .afk-track {
+  animation-play-state: paused;
 }
 
 /* Logo DMD: tiap garis "tergambar" sekali saat halaman dibuka.

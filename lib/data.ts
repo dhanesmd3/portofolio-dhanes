@@ -219,7 +219,7 @@ export const projects: Project[] = [
     id: "takooni",
     title: "Takooni",
     category: "SaaS Landing Page",
-    year: "2025", // TODO: cek tahun
+    year: "2026",
     description:
       "Landing page for an AI-powered SaaS that helps SEO teams find intent gaps, audit content quality, and track campaign performance over time.",
     stack: ["Next.js", "Tailwind CSS", "Motion"],
@@ -231,7 +231,7 @@ export const projects: Project[] = [
     id: "quacompute",
     title: "QuaCompute ID",
     category: "Community Website",
-    year: "2025", // TODO: cek tahun
+    year: "2025",
     description:
       "Home for an Indonesian community learning quantum computing from a software-engineering angle — roadmap, discussions, and collaboration for practitioners and researchers.",
     stack: ["Next.js", "Tailwind CSS"],
@@ -266,7 +266,7 @@ export const projects: Project[] = [
     id: "kualitas-air",
     title: "Water Quality Calculator",
     category: "Course Project",
-    year: "2025", // TODO: cek tahun
+    year: "2026",
     description:
       "Real-time converter for drinking-water parameters (TDS, salinity, EC, resistivity, ionic strength) checked against WHO and SNI standards.",
     stack: ["HTML", "CSS", "JavaScript"],
@@ -434,25 +434,168 @@ export const achievements: Achievement[] = [
 // ─── Beyond Tech ─────────────────────────────────────────────────────────
 
 export type GalleryItem = {
-  // Taruh foto di public/beyond/. Kosong = tampil placeholder.
+  // Foto di public/beyond/, sudah di-crop landscape 3:2 (1200×800).
+  // Foto asli (resolusi penuh) disimpan di luar repo: webporto/afk-originals/
   src?: string;
   alt: string;
-  // 1–3 kata, mis. "Futsal", "Hiking", "Coffee".
+  // 1–3 kata, muncul di pojok kartu, mis. "Futsal", "Hiking", "Coffee".
   caption: string;
-  // Info yang muncul saat kartu dibuka (1–2 kalimat).
-  description: string;
+  // Opsional: 1 kalimat yang muncul saat kartu di-hover.
+  description?: string;
 };
 
 export const beyondIntro = {
   title: "Away from the keyboard.",
-  // TODO: ganti dengan 1–2 kalimat tentang kamu di luar ngoding
-  body: "[One or two sentences about what you do when you're not coding — sports, places, people, things that keep you curious.]",
+  body: "Family, friends, lover, activity, and anything.",
 };
 
-// TODO: ganti dengan foto & cerita hobi kamu. Kartu disusun melingkar
-// (ring 3D), jadi 8–12 item paling bagus.
-export const gallery: GalleryItem[] = Array.from({ length: 8 }, (_, i) => ({
-  alt: `Hobby photo ${i + 1}`,
-  caption: "[Hobby]",
-  description: "[Where, when, or why it matters — one or two short lines.]",
-}));
+// Ditampilkan sebagai 3 kolom yang bergulir pelan (kiri & kanan ke atas,
+// tengah ke bawah). Foto dibagi ke kolom bergiliran sesuai urutan di sini.
+// Caption & alt ditulis dari isi foto — silakan sesuaikan.
+export const gallery: GalleryItem[] = [
+  {
+    src: "/beyond/afk-04.jpg",
+    alt: "Dhanes looking out at the sea during sunset",
+    caption: "Beach Sunset",
+  },
+  {
+    src: "/beyond/afk-14.jpg",
+    alt: "Dhanes about to shoot a basketball in an indoor court",
+    caption: "Basketball",
+  },
+  {
+    src: "/beyond/afk-23.jpg",
+    alt: "Dhanes by a lakeside temple in Bali",
+    caption: "Bali",
+  },
+  {
+    src: "/beyond/afk-01.jpg",
+    alt: "Friends sharing lunch at a gazebo by the rice fields",
+    caption: "Ricefield Lunch",
+  },
+  {
+    src: "/beyond/afk-12.jpg",
+    alt: "A tall waterfall falling down a green cliff",
+    caption: "Waterfall",
+  },
+  {
+    src: "/beyond/afk-17.jpg",
+    alt: "A seafood spread with crab, mussels, and corn",
+    caption: "Seafood Feast",
+  },
+  {
+    src: "/beyond/afk-20.jpg",
+    alt: "Dhanes overlooking a misty valley at golden hour",
+    caption: "Golden Hour",
+  },
+  {
+    src: "/beyond/afk-27.jpg",
+    alt: "Basketball team huddle with the coach during a game",
+    caption: "Basketball Team",
+  },
+  {
+    src: "/beyond/afk-07.jpg",
+    alt: "Fried eggs with spicy noodles on a white plate",
+    caption: "Late-Night Noodles",
+  },
+  {
+    src: "/beyond/afk-03.jpg",
+    alt: "Informatics students posing with a giant banner on a hill",
+    caption: "Informatics Batch",
+  },
+  {
+    src: "/beyond/afk-24.jpg",
+    alt: "Parasailing high above the sea",
+    caption: "Parasailing",
+  },
+  {
+    src: "/beyond/afk-10.jpg",
+    alt: "Misty sunrise over the forest from a viewpoint",
+    caption: "Sunrise Hike",
+  },
+  {
+    src: "/beyond/afk-28.jpg",
+    alt: "Friends posing together on a football pitch",
+    caption: "Football Crew",
+  },
+  {
+    src: "/beyond/afk-09.jpg",
+    alt: "Dhanes playing on an outdoor padel court",
+    caption: "Padel",
+  },
+  {
+    src: "/beyond/afk-05.jpg",
+    alt: "The stage of the Little Women musical before the show",
+    caption: "Little Women",
+  },
+  {
+    src: "/beyond/afk-16.jpg",
+    alt: "Dhanes standing in front of a volcano",
+    caption: "Volcano Trip",
+  },
+  {
+    src: "/beyond/afk-26.jpg",
+    alt: "Group selfie with cousins",
+    caption: "Cousins",
+  },
+  {
+    src: "/beyond/afk-13.jpg",
+    alt: "Rice fields and green hills under a clear sky",
+    caption: "Green Hills",
+  },
+  {
+    src: "/beyond/afk-02.jpg",
+    alt: "A plate of steak and noodles on a restaurant table",
+    caption: "Dinner Out",
+  },
+  {
+    src: "/beyond/afk-25.jpg",
+    alt: "Friends riding an inflatable boat on the waves",
+    caption: "Water Sports",
+  },
+  {
+    src: "/beyond/afk-11.jpg",
+    alt: "Dhanes and a friend at an outdoor festival",
+    caption: "Festival Night",
+  },
+  {
+    src: "/beyond/afk-18.jpg",
+    alt: "Watching Stephen Curry play for the Warriors on a laptop",
+    caption: "Warriors Night",
+  },
+  {
+    src: "/beyond/afk-21.jpg",
+    alt: "The sun setting over a calm sea",
+    caption: "Sea Sunset",
+  },
+  {
+    src: "/beyond/afk-29.jpg",
+    alt: "Friends in suits at a formal event",
+    caption: "Formal Night",
+  },
+  {
+    src: "/beyond/afk-15.jpg",
+    alt: "A gelato display case with many flavors",
+    caption: "Gelato Run",
+  },
+  {
+    src: "/beyond/afk-06.jpg",
+    alt: "Dhanes with a friend inside a building at night",
+    caption: "Evening Out",
+  },
+  {
+    src: "/beyond/afk-19.jpg",
+    alt: "A wide beach with ATVs and green cliffs",
+    caption: "Beach Day",
+  },
+  {
+    src: "/beyond/afk-08.jpg",
+    alt: "Photobooth strip with a group of friends",
+    caption: "Photobooth",
+  },
+  {
+    src: "/beyond/afk-22.jpg",
+    alt: "A crowded outdoor dinner by the sea at night",
+    caption: "Night Dinner",
+  },
+];
