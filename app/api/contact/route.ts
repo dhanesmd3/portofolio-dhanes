@@ -88,8 +88,10 @@ export async function POST(request: Request) {
   const { name, email, message } = parsed.data;
   const resend = new Resend(apiKey);
   const { error } = await resend.emails.send({
-    // onboarding@resend.dev = alamat testing Resend, tanpa perlu domain sendiri
-    from: "Portfolio <onboarding@resend.dev>",
+    // Default onboarding@resend.dev = alamat testing Resend (tanpa domain sendiri,
+    // hanya bisa kirim ke email akun Resend). Setelah domain diverifikasi di
+    // Resend, isi CONTACT_FROM_EMAIL, mis. "Dhanes Portfolio <hello@dhanesworo.site>".
+    from: process.env.CONTACT_FROM_EMAIL || "Portfolio <onboarding@resend.dev>",
     to,
     replyTo: email,
     subject: `New message from ${name} via portfolio`,
