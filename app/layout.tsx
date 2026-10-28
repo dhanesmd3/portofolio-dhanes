@@ -18,22 +18,47 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
-const description = `${profile.tagline}. ${profile.bio}`;
+// SEO: nama lengkap selalu di depan (judul, deskripsi, Open Graph) supaya
+// pencarian "Dhanesworo Muhammad Datiputro" mengarah ke halaman ini.
+const title = `${profile.name} (${profile.nickname}) — Portfolio`;
+const description = `${profile.name} (${profile.nickname}) — Informatics student at Institut Teknologi Bandung (ITB) and web developer. Projects, experience, and achievements, including Absolute Winner of the Indonesian National Mathematics Olympiad (INMO) 2024.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${profile.name} — ${profile.tagline}`,
-    template: `%s · ${profile.wordmark}`,
+    default: title,
+    template: `%s · ${profile.name}`,
   },
   description,
+  applicationName: profile.name,
+  authors: [{ name: profile.name, url: siteUrl }],
+  creator: profile.name,
+  alternates: { canonical: "/" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
   openGraph: {
-    type: "website",
-    title: profile.name,
+    type: "profile",
+    firstName: "Dhanesworo Muhammad",
+    lastName: "Datiputro",
+    username: profile.nickname,
+    title,
     description,
     url: "/",
+    siteName: profile.name,
     locale: "en_US",
   },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
+  // Isi GOOGLE_SITE_VERIFICATION dari Google Search Console (lihat .env.example)
+  ...(process.env.GOOGLE_SITE_VERIFICATION && {
+    verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
+  }),
 };
 
 export const viewport: Viewport = {
