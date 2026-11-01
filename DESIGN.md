@@ -147,7 +147,7 @@ Measured on the production build (1440×900): moving the cursor used to drop to 
 
 - **Reveal:** `opacity 0 → 1`, `y 12px → 0`, staggered 80ms, once per element (Motion `whileInView`, `viewport={{ once: true, amount: 0.2 }}`).
 - **Hover:** color and border shifts, image `scale(1.03)`, arrow glyph nudge 2px. Nothing jumps.
-- **Allowed loops:** the pulse on the `--live` dot, the Backdrop glows drifting over 26–34s, and the Beyond Tech photo columns' slow scroll (pauses on hover or with the Pause button).
+- **Allowed loops:** the pulse on the `--live` dot, the Backdrop glows drifting over 26–34s, the slow globe spin, and the Beyond Tech photo columns' slow scroll (pauses on hover or with the Pause button).
 - **Cursor light:** `PointerTracker` eases `--mx/--my` toward the pointer (18% per frame, stops when settled). Reduced motion → it jumps without easing.
 - **One-time flourish:** the hero nickname highlight (see Hero).
 - **Not allowed:** parallax, custom cursors, scroll-jacking, typing effects, marquees that can't be paused.
@@ -261,15 +261,14 @@ opacity: 0.7;
 ### Backdrop
 **Role:** Hyperstudio's "blueprint" idea made literal. Gives the page depth without competing with content.
 
-`components/Backdrop.tsx`, mounted once in `app/layout.tsx`, `position: fixed` behind everything (`-z-10`, `pointer-events: none`, `aria-hidden`). Three layers:
-1. **Blueprint grid:** 1px lines in `--accent` at 10%, every 72px, masked by a radial fade from the top center (`blueprint-grid` utility).
-2. **Glows:** two soft radial gradients of `--accent` at 22% (`accent-glow` utility): one wide at the top, one smaller bottom-right at 60% opacity. Each drifts slowly (`drift` keyframes, 26s / 34s, alternate). Radial gradients, not `filter: blur`, so it stays cheap.
-3. **Grain:** SVG fractal noise at 3.5% opacity, `mix-blend-mode: overlay`.
+`components/Backdrop.tsx`, mounted once in `app/layout.tsx`, `position: fixed` behind everything (`-z-10`, `pointer-events: none`, `aria-hidden`). Layers, back to front:
+1. **Glows:** two soft radial gradients of `--accent` at 22% (`accent-glow`): one wide at the top, one smaller bottom-right at 60% opacity, drifting slowly (`drift`, 26s / 34s).
+2. **Globe** (`components/BackdropGlobe.tsx`, inspired by puture.co.kr): a large sphere seen from outside, rising from the lower right (center ≈ 72% / 72% of the viewport, radius ≈ max(0.88·vh, 0.42·vw)). Latitude/longitude lines every 10° in `--accent` (max alpha .36 dark / .26 light) with a **"+" at every intersection** in `--fg` (.5 / .32), faded toward the horizon. It spins very slowly, rotates with **scroll**, tilts slightly toward the **pointer**, and lines/crosses brighten in a ~220px spotlight around the cursor. Plus ~70 dust specks drifting up and twinkling.
+   Drawn on a **2D canvas** (no WebGL/library): manual perspective projection, segments batched into 8 alpha buckets (≈16 `stroke()` calls per frame), redrawn at **30 fps**, DPR capped at 1.5, paused when the tab is hidden; colors re-read on theme change; reduced motion → static frame redrawn only on scroll.
+3. **Cursor light:** a 560px radial of `--accent` at 18% centered on `--mx/--my` (`cursor-light`).
+4. **Grain:** SVG fractal noise at 2.5% opacity.
 
-4. **Cursor light:** a 560px radial of `--accent` at 18% centered on `--mx/--my` (`cursor-light`).
-5. **Cursor grid:** a second blueprint grid at 32% `--accent`, masked to a 240px circle around the cursor (`cursor-grid`), so the blueprint "lights up" where the pointer is.
-
-`PointerTracker` (client, renders nothing) lives inside `Backdrop` and writes `--mx/--my` on `<html>`. On touch devices the light rests where the last touch was.
+`PointerTracker` (client, renders nothing) writes `--mx/--my` on `#backdrop` only. Content panels that need to read as solid use glass and cover the backdrop.
 
 ### Hero (Profile) — `#about`
 Viewport-tall minus header (`min-h-[calc(100svh-64px)]`), content vertically centered, no section header.
