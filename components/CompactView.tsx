@@ -285,7 +285,11 @@ export function CompactView() {
                       {project.title}
                     </ExternalLink>
                     <p className={cn(labelClass, "shrink-0 text-muted")}>
+                      {project.status === "IN PROGRESS" && (
+                        <span className="text-accent">In progress · </span>
+                      )}
                       {project.category} · {project.year}
+                      {!linkOf(project) && " · Private"}
                     </p>
                   </li>
                 ))}

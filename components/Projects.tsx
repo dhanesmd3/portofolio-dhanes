@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { projects } from "@/lib/data";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Lock } from "lucide-react";
+import { projects, type Project } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { ProjectCard } from "./ProjectCard";
 import { Reveal } from "./Reveal";
@@ -14,6 +14,58 @@ const featured = projects.filter((project) => project.featured);
 const archive = projects.filter((project) => !project.featured);
 
 const pad = (n: number) => String(n).padStart(2, "0");
+
+// Isi satu baris Archive (dipakai baik untuk baris ber-link maupun tidak)
+function ArchiveRowContent({
+  project,
+  href,
+}: {
+  project: Project;
+  href?: string;
+}) {
+  return (
+    <>
+      <div className="min-w-0 flex-1 md:grid md:grid-cols-[2fr_2fr_auto] md:items-baseline md:gap-6">
+        <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span className="text-body text-fg transition-transform duration-150 group-hover:translate-x-1">
+            {project.title}
+          </span>
+          {project.status === "IN PROGRESS" && (
+            <span className={cn(labelClass, "text-micro text-accent")}>
+              In progress
+            </span>
+          )}
+        </span>
+        <span className="mt-1 block text-body-sm text-muted md:mt-0">
+          {project.category}
+          <span className="md:hidden"> · {project.year}</span>
+        </span>
+        <span className={cn(labelClass, "hidden text-muted md:block")}>
+          {project.year}
+        </span>
+      </div>
+      {href ? (
+        <>
+          <ArrowUpRight
+            size={18}
+            strokeWidth={1.5}
+            className="mt-0.5 shrink-0 text-muted transition-colors duration-150 group-hover:text-accent"
+            aria-hidden="true"
+          />
+          <span className="sr-only">(opens in new tab)</span>
+        </>
+      ) : (
+        <span
+          className="mt-0.5 shrink-0 text-muted"
+          title={project.note ?? "Private"}
+        >
+          <Lock size={16} strokeWidth={1.5} aria-hidden="true" />
+          <span className="sr-only">{project.note ?? "Private"}</span>
+        </span>
+      )}
+    </>
+  );
+}
 
 export function Projects() {
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -174,41 +226,30 @@ export function Projects() {
           <Reveal className="mt-20">
             <h3 className={cn(labelClass, "text-muted")}>Archive</h3>
             <ul className="mt-4">
-              {archive.map((project) => (
-                <li
-                  key={project.id}
-                  className="border-t border-line last:border-b"
-                >
-                  <a
-                    href={project.url ?? project.repoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-start justify-between gap-6 py-5"
+              {archive.map((project) => {
+                const href = project.url ?? project.repoUrl;
+                return (
+                  <li
+                    key={project.id}
+                    className="border-t border-line last:border-b"
                   >
-                    <div className="min-w-0 flex-1 md:grid md:grid-cols-[2fr_2fr_auto] md:items-baseline md:gap-6">
-                      <span className="block text-body text-fg transition-transform duration-150 group-hover:translate-x-1">
-                        {project.title}
-                      </span>
-                      <span className="mt-1 block text-body-sm text-muted md:mt-0">
-                        {project.category}
-                        <span className="md:hidden"> · {project.year}</span>
-                      </span>
-                      <span
-                        className={cn(labelClass, "hidden text-muted md:block")}
+                    {href ? (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-start justify-between gap-6 py-5"
                       >
-                        {project.year}
-                      </span>
-                    </div>
-                    <ArrowUpRight
-                      size={18}
-                      strokeWidth={1.5}
-                      className="mt-0.5 shrink-0 text-muted transition-colors duration-150 group-hover:text-accent"
-                      aria-hidden="true"
-                    />
-                    <span className="sr-only">(opens in new tab)</span>
-                  </a>
-                </li>
-              ))}
+                        <ArchiveRowContent project={project} href={href} />
+                      </a>
+                    ) : (
+                      <div className="flex items-start justify-between gap-6 py-5">
+                        <ArchiveRowContent project={project} />
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </Reveal>
         )}

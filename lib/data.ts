@@ -137,7 +137,7 @@ export const toolGroups: ToolGroup[] = [
 
 // ─── Projects ────────────────────────────────────────────────────────────
 
-export type ProjectStatus = "LIVE" | "NEW" | "BETA" | "TOP 30";
+export type ProjectStatus = "LIVE" | "NEW" | "BETA" | "TOP 30" | "IN PROGRESS";
 
 export type ProjectImage = { src: string; width: number; height: number };
 
@@ -177,6 +177,38 @@ export const projects: Project[] = [
     // Slide pilihan dari pitch deck (cover → arsitektur), disusun vertikal
     image: { src: "/projects/full/ronda.jpg", width: 1440, height: 4860 },
     status: "TOP 30",
+    featured: true,
+  },
+  {
+    id: "dailytective",
+    title: "Dailytective",
+    category: "Web Game",
+    year: "2026",
+    description:
+      "A daily detective game — one new case every morning from Grandma's house. Players search the room for evidence and deduce who, with what, and where. Every case is verified by a built-in solver before release, with streaks, ID/EN languages, and CI checks.",
+    stack: ["SvelteKit", "TypeScript", "Upstash Redis", "Vercel"],
+    url: "https://dailytective.dhanesworo.site",
+    repoUrl: "https://github.com/dhanesmd3/dailytective",
+    // Beranda + 4 langkah "How to play", disusun vertikal
+    image: {
+      src: "/projects/full/dailytective.jpg",
+      width: 1440,
+      height: 4500,
+    },
+    status: "LIVE",
+    featured: true,
+  },
+  {
+    id: "chatbot",
+    title: "Chatbot CLI",
+    category: "AI · Command Line",
+    year: "2026",
+    description:
+      "A terminal chatbot powered by the Claude API: remembers the conversation, has a custom persona, streams replies, handles errors, counts tokens, and saves chat history. Includes an offline twin that runs a local model through Ollama.",
+    stack: ["Python", "Claude API", "Ollama"],
+    repoUrl: "https://github.com/dhanesmd3/chatbot",
+    // Kode asli chatbot.py (aplikasi terminal, tidak punya tampilan web)
+    image: { src: "/projects/full/chatbot.jpg", width: 1440, height: 4834 },
     featured: true,
   },
   {
@@ -240,6 +272,52 @@ export const projects: Project[] = [
     url: "https://quacompute.id/",
     image: { src: "/projects/full/quacompute.jpg", width: 1440, height: 2184 },
     featured: true,
+  },
+  {
+    id: "fake-news-detection",
+    title: "Fake News Detection",
+    category: "Machine Learning",
+    year: "2026",
+    description:
+      "Classifies Indonesian news as hoax or valid with TF-IDF and Logistic Regression (Naive Bayes as a baseline), trained on 27k articles.",
+    stack: ["Python", "Jupyter"],
+    repoUrl: "https://github.com/dhanesmd3/Fake-News-Detection",
+    status: "IN PROGRESS",
+    featured: false,
+  },
+  {
+    id: "ngebedahkuy",
+    title: "ngeBEDAHkuy",
+    category: "Roblox Game",
+    year: "2026",
+    description:
+      "A chaotic co-op surgery game for 1–4 players on Roblox: keep Mr. Bob asleep, handle surprise complications, and finish the operation together.",
+    stack: ["Luau", "Roblox Studio", "Rojo"],
+    note: "Private repository",
+    status: "IN PROGRESS",
+    featured: false,
+  },
+  {
+    id: "algeo-calculator",
+    title: "Linear Algebra Calculator",
+    category: "Course Project",
+    year: "2026",
+    description:
+      "Java library and CLI/GUI app for linear systems, determinants, inverses, polynomial interpolation, and cubic splines — all matrix math written from scratch (IF2123, team of 3).",
+    stack: ["Java", "Swing"],
+    note: "Private repository",
+    featured: false,
+  },
+  {
+    id: "eye-of-cipher",
+    title: "Eye of Cipher — Browser Simulation",
+    category: "Course Project",
+    year: "2026",
+    description:
+      "Command-line web browser simulation in C, built for Algorithms & Programming 1 (IF1210, team of 5).",
+    stack: ["C", "Make"],
+    note: "Private repository",
+    featured: false,
   },
   {
     id: "makalah-matdis",
