@@ -143,7 +143,11 @@ export function CompactView() {
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <a href={profile.cvUrl} download className={buttonStyles.primary}>
+            <a
+              href={profile.cvUrl}
+              download={profile.cvFileName}
+              className={buttonStyles.primary}
+            >
               Download CV
               <ArrowDown
                 size={16}

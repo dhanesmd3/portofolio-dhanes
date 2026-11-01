@@ -61,7 +61,11 @@ export function Hero() {
           </motion.p>
 
           <motion.div variants={item} className="mt-8 flex flex-wrap gap-3">
-            <a href={profile.cvUrl} download className={buttonStyles.primary}>
+            <a
+              href={profile.cvUrl}
+              download={profile.cvFileName}
+              className={buttonStyles.primary}
+            >
               Download CV
               <ArrowDown
                 size={16}

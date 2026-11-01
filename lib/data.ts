@@ -18,6 +18,8 @@ export const profile = {
   timeZoneLabel: "WIB",
   email: "dhanesworo.md@gmail.com",
   cvUrl: "/cv-dhanesworo.pdf",
+  // Nama file saat CV diunduh pengunjung
+  cvFileName: "CV - Dhanesworo Muhammad Datiputro.pdf",
   // Idealnya PNG/WebP dengan background sudah dihapus (lihat DESIGN.md → Imagery).
   photoUrl: "/profile.jpg",
   availability: "Open to internships",
