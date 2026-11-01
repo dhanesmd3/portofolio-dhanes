@@ -7,9 +7,9 @@ import { PointerTracker } from "./PointerTracker";
  * dan debu halus (BackdropGlobe), cahaya biru yang mengikuti kursor, dan
  * butiran halus. Sengaja samar — terasa, tapi tidak bersaing dengan konten.
  *
- * Catatan performa: --mx/--my hanya di-set pada #backdrop (lihat
- * PointerTracker), cahaya ambient dipisah ke layer GPU sendiri
- * (will-change), dan grain tidak memakai blend mode.
+ * Catatan performa: setiap lapisan yang bergerak punya layer GPU sendiri
+ * (will-change) dan hanya diubah lewat transform — globe digambar di Web
+ * Worker, cahaya kursor cuma digeser, grain digambar sekali saja.
  */
 export function Backdrop() {
   return (
@@ -25,8 +25,8 @@ export function Backdrop() {
         </div>
         <div className="absolute -right-[20vw] -bottom-[30vh] h-[70vh] w-[70vw] animate-[drift_34s_ease-in-out_infinite_alternate-reverse] opacity-60 will-change-transform accent-glow" />
         <BackdropGlobe />
-        <div className="absolute inset-0 cursor-light" />
-        <div className="absolute inset-0 grain opacity-[0.025]" />
+        <div id="cursor-light" className="absolute top-0 left-0 cursor-light" />
+        <div className="absolute inset-0 grain opacity-[0.025] will-change-transform" />
       </div>
     </>
   );

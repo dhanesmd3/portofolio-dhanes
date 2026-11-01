@@ -20,7 +20,7 @@ This system blends five references. Each one contributes something specific:
 **Where we break from Hyperstudio, on purpose:**
 - **Photography is allowed in three places only:** the hero portrait, project screenshots, and the Beyond Tech gallery. It always gets a disciplined treatment (fade mask, hairline frame, grayscale).
 - **There's one personal accent, Blueprint Blue** (`#4a7be3` dark / `#1e47b8` light). It replaces Hyperstudio's dim Compass Gold, but follows the same rule: it marks things, it never fills them. Neutrals are tilted slightly cool (navy-black) to sit with it.
-- **The page has a quiet backdrop** (blueprint grid + slow blue glow + grain) instead of a flat canvas, and a **light that follows the cursor**. See *Backdrop*.
+- **The page has a quiet backdrop** (globe grid + slow blue glow + grain) instead of a flat canvas, and a **light that follows the cursor**. See *Backdrop*.
 - **Floating surfaces are liquid glass** (from newminds): header, tool grid, experience side panel, contact form, buttons and badges. Glass gets a 20px radius and a soft shadow; everything else keeps Hyperstudio's flat hairline rules.
 - **A light theme exists.** Every token has a light value.
 - **The header is sticky.**
@@ -50,7 +50,6 @@ Components use **semantic tokens** only (`bg-canvas`, `text-fg`, `text-muted`, `
 | `--glass-border` | `rgb(255 255 255 / 0.10)` | `rgb(16 19 26 / 0.09)` | 1px edge of glass surfaces. |
 | `--glass-highlight` | `rgb(255 255 255 / 0.09)` | `rgb(255 255 255 / 0.85)` | Inset 1px highlight on the top edge (the "wet" look). |
 | `--glass-shadow` | `0 18px 70px -24px rgb(0 0 0 / .65)` | `0 18px 60px -28px rgb(16 19 26 / .28)` | Soft lift under glass. |
-| `--mx` / `--my` | cursor position (px) | — | Written by `PointerTracker` **on `#backdrop` only** (never on `<html>` — that forces a style recalc of the whole page every frame); default `50vw 18vh`. |
 
 Contrast is checked: `--muted` on `--canvas` is ≈7.2:1 in dark and ≈5.3:1 in light; `--accent` passes 4.5:1 for small numerals in both themes (≈4.8:1 dark, ≈7.3:1 light).
 
@@ -128,9 +127,11 @@ The page background never changes between sections (the Backdrop is fixed to the
 
 ## Performance rules
 
-Measured on the production build (1440×900): moving the cursor used to drop to ~15 fps because `--mx/--my` lived on `<html>` and glass panels had a cursor sheen with `background-attachment: fixed`. After the fixes below it holds ~55 fps.
+Measured on the production build (1440×900): moving the cursor used to drop to ~15 fps because `--mx/--my` lived on `<html>` and glass panels had a cursor sheen with `background-attachment: fixed`. After the fixes below it holds ~55 fps. A second pass (globe in a Web Worker, cursor light moved by `transform`, PNG grain) took cursor movement from ~52 to 60 fps with ~0% slow frames; scroll fps now equals the page with the backdrop disabled.
 
-- Write per-frame CSS variables on the smallest element that needs them (`#backdrop`), never on `<html>`/`<body>`.
+- Never write per-frame CSS variables on `<html>`/`<body>` (forces a style recalc of the whole page). Better still, don't use per-frame CSS variables at all: move an element with `transform`.
+- Continuous canvas drawing runs in a **Web Worker** on an `OffscreenCanvas` (main-thread fallback only when unsupported), at ≤30 fps with DPR capped at 1.25. Pointer/scroll are forwarded at most once per frame.
+- No full-screen gradients that repaint when the cursor moves, and no SVG filters (`feTurbulence`) as textures: use a small PNG tile.
 - `backdrop-filter` only on a handful of large floating surfaces (header, tool grid, side panel, form). Small elements use `glass-chip` (no blur).
 - No `background-attachment: fixed` and no `mix-blend-mode` on full-screen layers.
 - Long-running animations only on `transform`/`opacity` of layers marked `will-change: transform`.
@@ -148,7 +149,7 @@ Measured on the production build (1440×900): moving the cursor used to drop to 
 - **Reveal:** `opacity 0 → 1`, `y 12px → 0`, staggered 80ms, once per element (Motion `whileInView`, `viewport={{ once: true, amount: 0.2 }}`).
 - **Hover:** color and border shifts, image `scale(1.03)`, arrow glyph nudge 2px. Nothing jumps.
 - **Allowed loops:** the pulse on the `--live` dot, the Backdrop glows drifting over 26–34s, the slow globe spin, and the Beyond Tech photo columns' slow scroll (pauses on hover or with the Pause button).
-- **Cursor light:** `PointerTracker` eases `--mx/--my` toward the pointer (18% per frame, stops when settled). Reduced motion → it jumps without easing.
+- **Cursor light:** `PointerTracker` eases `#cursor-light`'s `transform` toward the pointer (18% per frame, stops when settled). Reduced motion → it jumps without easing.
 - **One-time flourish:** the hero nickname highlight (see Hero).
 - **Not allowed:** parallax, custom cursors, scroll-jacking, typing effects, marquees that can't be paused.
 - `prefers-reduced-motion: reduce` disables reveals, image scale, the pulse and the photo columns. Color transitions stay.
@@ -263,12 +264,12 @@ opacity: 0.7;
 
 `components/Backdrop.tsx`, mounted once in `app/layout.tsx`, `position: fixed` behind everything (`-z-10`, `pointer-events: none`, `aria-hidden`). Layers, back to front:
 1. **Glows:** two soft radial gradients of `--accent` at 22% (`accent-glow`): one wide at the top, one smaller bottom-right at 60% opacity, drifting slowly (`drift`, 26s / 34s).
-2. **Globe** (`components/BackdropGlobe.tsx`, inspired by puture.co.kr): a large sphere seen from outside, rising from the lower right (center ≈ 72% / 72% of the viewport, radius ≈ max(0.88·vh, 0.42·vw)). Latitude/longitude lines every 10° in `--accent` (max alpha .36 dark / .26 light) with a **"+" at every intersection** in `--fg` (.5 / .32), faded toward the horizon. It spins very slowly, rotates with **scroll**, tilts slightly toward the **pointer**, and lines/crosses brighten in a ~220px spotlight around the cursor. Plus ~70 dust specks drifting up and twinkling.
-   Drawn on a **2D canvas** (no WebGL/library): manual perspective projection, segments batched into 8 alpha buckets (≈16 `stroke()` calls per frame), redrawn at **30 fps**, DPR capped at 1.5, paused when the tab is hidden; colors re-read on theme change; reduced motion → static frame redrawn only on scroll.
-3. **Cursor light:** a 560px radial of `--accent` at 18% centered on `--mx/--my` (`cursor-light`).
-4. **Grain:** SVG fractal noise at 2.5% opacity.
+2. **Globe** (`components/BackdropGlobe.tsx`, inspired by puture.co.kr): a large sphere seen from outside, rising from the lower right (center ≈ 72% / 72% of the viewport, radius ≈ max(0.88·vh, 0.42·vw)). Latitude/longitude lines every 10° in `--accent` (max alpha .36 dark / .26 light) with a **"+" at every intersection** in `--fg` (.5 / .32), faded toward the horizon. It spins very slowly, rotates with **scroll**, tilts slightly toward the **pointer**, and lines/crosses brighten in a ~220px spotlight around the cursor. Plus 60 dust specks drifting up and twinkling.
+   Drawn on a **2D canvas** (no WebGL/library). The drawing core is `components/globe/renderer.ts` (DOM-free) and runs in a **Web Worker** (`components/globe/globe.worker.ts`) via `OffscreenCanvas`, falling back to the main thread when unsupported. It uses a manual perspective projection and batches segments into 8 alpha buckets (≈16 `stroke()` calls per frame). It redraws at **30 fps** with DPR capped at 1.25 and pauses when the tab is hidden. Colors are re-read on theme change. With reduced motion it draws a static frame, redrawn only on scroll.
+3. **Cursor light:** a 1120px circle (`#cursor-light`, `cursor-light`) with a radial of `--accent` at 18%, **moved with `transform`** (never repainted).
+4. **Grain:** a 128px noise tile (`public/noise.png`) at 2.5% opacity.
 
-`PointerTracker` (client, renders nothing) writes `--mx/--my` on `#backdrop` only. Content panels that need to read as solid use glass and cover the backdrop.
+`PointerTracker` (client, renders nothing) moves `#cursor-light` only. Content panels that need to read as solid use glass and cover the backdrop.
 
 ### Hero (Profile) — `#about`
 Viewport-tall minus header (`min-h-[calc(100svh-64px)]`), content vertically centered, no section header.

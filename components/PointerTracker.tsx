@@ -3,18 +3,17 @@
 import { useEffect } from "react";
 
 /**
- * Menyalin posisi kursor ke CSS variable --mx / --my pada elemen #backdrop,
- * dengan sedikit "lag" (lerp) supaya cahaya terasa mengalir.
+ * Menggeser lingkaran cahaya (#cursor-light) mengikuti kursor dengan sedikit
+ * "lag" (lerp) supaya terasa mengalir. Tidak me-render apa pun.
  *
- * Penting untuk performa: variable sengaja dipasang di #backdrop, BUKAN di
- * <html>. Mengubah custom property di <html> memaksa browser menghitung
- * ulang style seluruh halaman setiap frame — itu yang dulu bikin lag.
- * Tidak me-render apa pun.
+ * Penting untuk performa: yang diubah hanya `transform` satu elemen kecil,
+ * bukan CSS variable / gradient selayar penuh. Transform dikerjakan
+ * compositor (GPU) tanpa repaint, jadi gerakan kursor tetap 60 fps.
  */
 export function PointerTracker() {
   useEffect(() => {
-    const target = document.getElementById("backdrop");
-    if (!target) return;
+    const light = document.getElementById("cursor-light");
+    if (!light) return;
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -23,8 +22,7 @@ export function PointerTracker() {
     let frame = 0;
 
     const apply = () => {
-      target.style.setProperty("--mx", `${current.x.toFixed(1)}px`);
-      target.style.setProperty("--my", `${current.y.toFixed(1)}px`);
+      light.style.transform = `translate3d(${current.x.toFixed(1)}px, ${current.y.toFixed(1)}px, 0)`;
     };
 
     const tick = () => {
@@ -50,6 +48,7 @@ export function PointerTracker() {
       if (!frame) frame = requestAnimationFrame(tick);
     };
 
+    apply();
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     return () => {
       window.removeEventListener("pointermove", onPointerMove);
